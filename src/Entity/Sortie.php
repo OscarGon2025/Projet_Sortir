@@ -32,6 +32,10 @@ class Sortie
     #[ORM\Column(type: Types::TEXT)]
     private ?string $infoSortie = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Etat $etat = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +109,18 @@ class Sortie
     public function setInfoSortie(string $infoSortie): static
     {
         $this->infoSortie = $infoSortie;
+
+        return $this;
+    }
+
+    public function getEtat(): ?Etat
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(?Etat $etat): static
+    {
+        $this->etat = $etat;
 
         return $this;
     }
