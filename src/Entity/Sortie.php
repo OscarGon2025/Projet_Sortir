@@ -32,6 +32,18 @@ class Sortie
     #[ORM\Column(type: Types::TEXT)]
     private ?string $infoSortie = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Etat $etat = null;
+
+    #[ORM\ManyToOne(inversedBy: 'sorties')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Site $siteOrganisateur = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Lieu $Lieu = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +117,42 @@ class Sortie
     public function setInfoSortie(string $infoSortie): static
     {
         $this->infoSortie = $infoSortie;
+
+        return $this;
+    }
+
+    public function getEtat(): ?Etat
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(?Etat $etat): static
+    {
+        $this->etat = $etat;
+
+        return $this;
+    }
+
+    public function getSiteOrganisateur(): ?Site
+    {
+        return $this->siteOrganisateur;
+    }
+
+    public function setSiteOrganisateur(?Site $siteOrganisateur): static
+    {
+        $this->siteOrganisateur = $siteOrganisateur;
+
+        return $this;
+    }
+
+    public function getLieu(): ?Lieu
+    {
+        return $this->Lieu;
+    }
+
+    public function setLieu(?Lieu $Lieu): static
+    {
+        $this->Lieu = $Lieu;
 
         return $this;
     }
