@@ -7,14 +7,22 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
+#[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\Column(length: 180)]
+    private ?string $username = null;
 
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
@@ -25,14 +33,21 @@ class User
     #[ORM\Column(length: 10)]
     private ?string $telephone = null;
 
+    /**
+     * @var string The hashed password
+     */
+
+    #[ORM\Column]
+    private ?string $password = null;
+
     #[ORM\Column(length: 255)]
     private ?string $mail = null;
 
-    #[ORM\Column]
-    private ?bool $administrateur = null;
+    #[ORM\Column(type: 'boolean')]
+    private ?bool $administrateur = false;
 
-    #[ORM\Column]
-    private ?bool $actif = null;
+    #[ORM\Column(type: 'boolean')]
+    private ?bool $actif = true;
 
     /**
      * @var Collection<int, Sortie>
@@ -47,7 +62,7 @@ class User
     private Collection $estInscrit;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
-    #[ORM\JoinColumn(nullable: false)]
+//    #[ORM\JoinColumn(nullable: false)]
     private ?Site $estRattacheA = null;
 
     public function __construct()
@@ -67,6 +82,30 @@ class User
 
         return $this;
     }
+
+    public function getUsername(): ?string
+    {
+        return $this->username;
+    }
+
+    public function setUsername(string $username): static
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
 
     public function getNom(): ?string
     {
@@ -204,5 +243,22 @@ class User
         $this->estRattacheA = $estRattacheA;
 
         return $this;
+    }
+
+    public function getRoles(): array
+    {
+        // TODO: Implement getRoles() method.
+        return ['ROLE_USER'];
+    }
+
+    public function eraseCredentials()
+    {
+        // TODO: Implement eraseCredentials() method.
+    }
+
+    public function getUserIdentifier(): string
+    {
+        // TODO: Implement getUserIdentifier() method.
+        return $this->username;
     }
 }
