@@ -1,15 +1,61 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello SecurityController!{% endblock %}
+{% block title %}Log in!{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <div class="uk-section uk-flex uk-flex-middle uk-animation-fade" uk-height-viewport>
+        <div class="uk-width-1-1">
+            <div class="uk-container">
+                <div class="uk-grid-margin uk-grid uk-grid-stack" uk-grid>
+                    <div class="uk-width-1-1@m">
+                        <div class="uk-margin uk-width-large uk-margin-auto uk-card uk-card-default uk-card-body uk-box-shadow-large">
+                            <h3 class="uk-card-title uk-text-center">Welcome back!</h3>
+                            <form method="post">
 
-<div class="example-wrapper">
-    <h1>Bienvenue sur la page de login ! ✅</h1>
+                                {% if error %}
+                                    <div class="uk-alert-danger" uk-alert>
+                                        <a href class="uk-alert-close" uk-close></a>
+                                        <p>{{ error.messageKey|trans(error.messageData, 'security') }}</p>
+                                    </div>
+                                {% endif %}
 
-</div>
+                                {# Veut dire si je suis connecté ou pas #}
+                                {% if app.user %}
+                                    <div class="uk-alert-primary" uk-alert>
+                                        <a href class="uk-alert-close" uk-close></a>
+                                        <p> You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a></p>
+                                    </div>
+                                {% endif %}
+
+                                <div class="uk-margin">
+                                    <div class="uk-inline uk-width-1-1">
+                                        <span class="uk-form-icon" uk-icon="icon: mail"></span>
+                                        <input class="uk-input uk-form-large" type="text"  value="{{ last_username }}" name="username">
+                                    </div>
+                                </div>
+                                <div class="uk-margin">
+                                    <div class="uk-inline uk-width-1-1">
+                                        <span class="uk-form-icon" uk-icon="icon: lock"></span>
+                                        <input class="uk-input uk-form-large" type="password" name="password">
+                                    </div>
+                                </div>
+                                <div class="uk-margin">
+                                    <label>
+                                        <input class="uk-checkbox" type="checkbox" name="_remember_me"> Remember me
+                                    </label>
+                                </div>
+                                <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+                                <div class="uk-margin">
+                                    <button class="uk-button uk-button-primary uk-button-large uk-width-1-1" type="submit">Login</button>
+                                </div>
+                                <div class="uk-text-small uk-text-center">
+{#                                    Not registered? <a href="{{ path('app_register') }}">Create an account</a>#}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
