@@ -14,6 +14,24 @@ class Sortie
     #[ORM\Column]
     private ?int $id = null;
 
+
+    // Añade justo antes del primero   id
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    private ?\DateTimeImmutable $dateCreated = null;
+
+    public function getDateCreated(): ?\DateTimeImmutable
+    {
+        return $this->dateCreated;
+    }
+
+    public function setDateCreated(\DateTimeImmutable $dateCreated): static
+    {
+        $this->dateCreated = $dateCreated;
+        return $this;
+    }
+    // Añade justo antes del primero id
+
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
 

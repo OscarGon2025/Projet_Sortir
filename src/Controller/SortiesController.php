@@ -2,6 +2,12 @@
 
 namespace App\Controller;
 
+
+use App\Entity\Site;
+use App\Entity\Etat;
+use App\Entity\Sortie;
+use App\Form\SortieType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,27 +28,30 @@ final class SortiesController extends AbstractController
     {
         $sortie = new Sortie();
 
-        $form = $this->createForm(SortiesController::class, $sortie);
+        $form = $this->createForm(SortieType::class, $sortie);
         $form->handleRequest($request);
 
+        if (!$sortie->getDateCreated()) {
+            $sortie->setDateCreated(new \DateTimeImmutable());
+        }
+
+
         if ($form->isSubmitted() && $form->isValid()) {
-            // Publié par défaut
-            $sortie->setIsPublished(true);
-            // Date = Now
-            $sortie->setDateCreated(new \DateTimeImmutable("now"));
 
             $em->persist($sortie);
             $em->flush();
 
-            $this->addFlash("success", "Sortie Cree");
+            $this->addFlash("success", "Sortie créée.");
 
-            return $this->redirectToRoute('', ['id' => $wish->getId()]);
+            return $this->redirectToRoute('app_main', ['id' => $sortie->getId()]);
         }
 
-        //TODO  CREER FICHIER TWIG
-
-        return $this->render('sorties/create.html.twig', [
-            'wishForm' => $form->createView(),
+        return $this->render('sorties/create_sortie.html.twig', [
+            'sortieForm' => $form->createView(),
         ]);
     }
+
+
+
+
 }
