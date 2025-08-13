@@ -36,7 +36,6 @@ final class SortieController extends AbstractController
             $sortie->setDateCreated(new \DateTimeImmutable());
         }
 
-
         if ($form->isSubmitted() && $form->isValid()) {
 
             $em->persist($sortie);
@@ -46,17 +45,16 @@ final class SortieController extends AbstractController
 
             return $this->redirectToRoute('app_main', ['id' => $sortie->getId()]);
         }
-
         return $this->render('sorties/create_sortie.html.twig', [
             'sortieForm' => $form->createView(),
         ]);
     }
 
-    #[Route('/sortie-list', name: 'app_sortie', methods: ['GET'])]
+    #[Route('/sorties-list', name: 'app_sortie', methods: ['GET'])]
     public function list(sortieRepository $repository): Response
     {
         $sorties = $repository->findAll();
-        return $this->render('sortie/index.html.twig', [
+        return $this->render('sortie/list.html.twig', [
             'sorties' => $sorties,
         ]);
     }
