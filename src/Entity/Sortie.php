@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\SortieRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -61,6 +63,44 @@ class Sortie
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Lieu $Lieu = null;
+
+    #[ORM\ManyToOne(inversedBy: 'sorties')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $organisateur = null;
+
+    /** @var Collection<int, User> */
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'estInscrit')]
+    private Collection $users;
+
+    public function __construct()
+    {
+        $this->users = new ArrayCollection();
+    }
+
+    public function getOrganisateur(): ?User { return $this->organisateur; }
+    public function setOrganisateur(?User $organisateur): static
+    {
+        $this->organisateur = $organisateur;
+        return $this;
+    }
+
+    /** @return Collection<int, User> */
+    public function getUsers(): Collection { return $this->users; }
+    public function addUser(User $user): static
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+            $user->addEstInscrit($this); // garde les deux côtés en phase
+        }
+        return $this;
+    }
+    public function removeUser(User $user): static
+    {
+        if ($this->users->removeElement($user)) {
+            // optionnel: détacher aussi côté User
+        }
+        return $this;
+    }
 
     public function getId(): ?int
     {
