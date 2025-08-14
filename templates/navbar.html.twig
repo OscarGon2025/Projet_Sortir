@@ -6,33 +6,32 @@
     <link rel="icon" href="img/favicon.ico">
     <!-- CSS FILES -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/uikit@latest/dist/css/uikit.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ asset('styles/app.css') }}">
     <style>
         .lead {
-            font-size: 1.175em;
-            font-weight: 300;
+            font-size: 1.180em;
+            font-weight: 430;
         }
         .uk-logo img {
-            height: 28px;
+            height: 40px;
         }
     </style>
 </head>
 
 <!-- NAV -->
-<div class="uk-position-fixed uk-position-top uk-width-1-1" style="z-index: 1000;">
-
-
+<div class="uk-position-fixed uk-position-top uk-width-1-1 uk-text-white uk-text-large" style="z-index: 1000;">
 
     <div class="uk-container uk-container-small">
         <nav class="uk-navbar-container uk-navbar-transparent" data-uk-navbar>
             <div class="uk-navbar-left">
                 <div class="uk-navbar-item">
-                    <a class="uk-logo" href=""><img src="{{ asset('images/logo_eni.png') }}" alt="Logo"></a>
+                    <a class="uk-logo" href="/"><img src="{{ asset('images/ecole-informatique.svg') }}" alt="Logo"></a>
                 </div>
             </div>
             <div class="uk-navbar-right">
                 <ul class="uk-navbar-nav">
-                    <li class="uk-active uk-visible@m"><a href="" data-uk-icon="home"></a></li>
-                    <li class="uk-visible@s"><a href="">Features</a></li>
+                    <li class="uk-active uk-visible@m"><a href="/" data-uk-icon="home"></a></li>
+                    <li class="uk-visible@s"><a href="">Qui Sommes nous?</a></li>
                     <li class="uk-visible@s"><a href="/login">Login</a></li>
                     <li class="uk-visible@s"><a href="/sortie-create">Create</a></li>
                     <li><a class="uk-navbar-toggle" data-uk-toggle data-uk-navbar-toggle-icon href="#offcanvas-nav"></a></li>
