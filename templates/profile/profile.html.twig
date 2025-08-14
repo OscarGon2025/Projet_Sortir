@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil Utilisateur{% endblock %}
+
+{% block body %}
+
+    <h2>Bienvenue sur votre profil utilisateur {{ user.username }}</h2>
+
+    <p>Pseudo : {{ user.username }}</p>
+    <p>Nom : {{ user.nom }}</p>
+    <p>Prénom : {{ user.prenom }}</p>
+    <p>Téléphone : {{ user.telephone }}</p>
+    <p>Mail : {{ user.mail }}</p>
+{#    <p>Mot de passe : {{ user.password }}</p>#}
+    <a href="{{ path('app_change_password') }}" class="btn btn-primary">Changer mon mot de passe</a>
+
+{% endblock %}
