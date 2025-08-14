@@ -7,24 +7,21 @@ use App\Entity\Lieu;
 use App\Entity\Site;
 use App\Entity\Sortie;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-//class SortiesFixtures extends Fixture
-//{
-//    public function load(ObjectManager $manager): void
-//    {
-//        // $product = new Product();
-//        // $manager->persist($product);
-//
-//        $manager->flush();
-//    }
-//}
-
-class SortieFixtures extends Fixture
+class SortieFixtures extends Fixture implements DependentFixtureInterface
 {
+    public function getDependencies(): array
+    {
+        return [
+            UserFixtures::class,
+            SiteFixtures::class,
+        ];
+    }
+
     public function load(ObjectManager $manager): void
     {
-
         $etat1 = new Etat();
         $etat1->setLibelle('Créée');
         $manager->persist($etat1);
@@ -33,11 +30,10 @@ class SortieFixtures extends Fixture
         $etat2->setLibelle('Ouverte');
         $manager->persist($etat2);
 
-
         $site = new Site();
-        $site->setNom('Site principal');
+        $site->setNom('Rennes');
+        $site = $this->getReference('site-rennes', Site::class);
         $manager->persist($site);
-
 
         $lieu = new Lieu();
         $lieu->setVille('Paris');
@@ -48,9 +44,6 @@ class SortieFixtures extends Fixture
         $lieu->setLongitude(2.3522);
         $manager->persist($lieu);
 
-
-
-
         $sortie = new Sortie();
         $sortie->setNom('Sortie test');
         $sortie->setDateCreated(new \DateTimeImmutable('now'));
@@ -59,14 +52,21 @@ class SortieFixtures extends Fixture
         $sortie->setDuree(120);
         $sortie->setNbInscriptionsMax(20);
         $sortie->setInfoSortie('Sortie créée via fixture complète');
-        $sortie->setEtat($etat1);         // Asignar uno de los estados creados
+        $sortie->setEtat($etat1);
         $sortie->setSiteOrganisateur($site);
         $sortie->setLieu($lieu);
+
+        $sortie->setSiteOrganisateur($site);
+
+        $organisateur = $this->getReference('user1', \App\Entity\User::class);
+        $sortie->setOrganisateur($organisateur);
 
 
 
         $manager->persist($sortie);
-
         $manager->flush();
     }
+
+
 }
+

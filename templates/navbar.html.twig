@@ -1,37 +1,90 @@
-<nav class="uk-navbar-container" uk-navbar>
-    <div class="uk-navbar-left">
-        <a class="uk-navbar-toggle uk-navbar-toggle-animate" uk-navbar-toggle-icon href="#"></a>
-        <div class="uk-navbar-dropdown">
-            <ul class="uk-nav uk-navbar-dropdown-nav">
-                <li class="uk-active"><a href="#">Active</a></li>
-                <li><a href="#">Item</a></li>
-                <li><a href="#">Item</a></li>
-            </ul>
-        </div>
-    </div>
 
-    <div class="uk-navbar-center">
-        <a href="#">
-            <img src="{{ asset('images/eni-logo.png') }}" alt="Logo" style="height:40px;">
-        </a>
-    </div>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cover - UIkit 3 KickOff</title>
+    <link rel="icon" href="img/favicon.ico">
+    <!-- CSS FILES -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/uikit@latest/dist/css/uikit.min.css">
+    <style>
+        .lead {
+            font-size: 1.175em;
+            font-weight: 300;
+        }
+        .uk-logo img {
+            height: 28px;
+        }
+    </style>
+</head>
 
-    <div class="uk-navbar-right">
-        <ul class="uk-navbar-nav">
-            <li>
-                <a href="#"><span uk-icon="user" ratio="1.3"></span></a>
-                <div class="uk-navbar-dropdown">
-                    <ul class="uk-nav uk-navbar-dropdown-nav">
-                        <li class="uk-active"><a href="#">Active</a></li>
-                        <li><a href="#">Item</a></li>
-                        <li class="uk-nav-header">Header</li>
-                        <li><a href="#">Item</a></li>
-                        <li><a href="#">Item</a></li>
-                        <li class="uk-nav-divider"></li>
-                        <li><a href="#">Item</a></li>
-                    </ul>
+<!-- NAV -->
+<div class="uk-position-fixed uk-position-top uk-width-1-1" style="z-index: 1000;">
+
+
+
+    <div class="uk-container uk-container-small">
+        <nav class="uk-navbar-container uk-navbar-transparent" data-uk-navbar>
+            <div class="uk-navbar-left">
+                <div class="uk-navbar-item">
+                    <a class="uk-logo" href=""><img src="{{ asset('images/logo_eni.png') }}" alt="Logo"></a>
                 </div>
-            </li>
-        </ul>
+            </div>
+            <div class="uk-navbar-right">
+                <ul class="uk-navbar-nav">
+                    <li class="uk-active uk-visible@m"><a href="" data-uk-icon="home"></a></li>
+                    <li class="uk-visible@s"><a href="">Features</a></li>
+                    <li class="uk-visible@s"><a href="/login">Login</a></li>
+                    <li class="uk-visible@s"><a href="/sortie-create">Create</a></li>
+                    <li><a class="uk-navbar-toggle" data-uk-toggle data-uk-navbar-toggle-icon href="#offcanvas-nav"></a></li>
+                </ul>
+            </div>
+        </nav>
     </div>
-</nav>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit-icons.min.js"></script>
+
+<!-- /NAV -->
+
+
+
+
+
+{#<nav class="uk-navbar-container" uk-navbar>#}
+{#    <div class="uk-navbar-left">#}
+{#        <a class="uk-navbar-toggle uk-navbar-toggle-animate" uk-navbar-toggle-icon href="#"></a>#}
+{#        <div class="uk-navbar-dropdown">#}
+{#            <ul class="uk-nav uk-navbar-dropdown-nav">#}
+{#                <li class="uk-active"><a href="#">Active</a></li>#}
+{#                <li><a href="#">Item</a></li>#}
+{#                <li><a href="#">Item</a></li>#}
+{#            </ul>#}
+{#        </div>#}
+{#    </div>#}
+
+{#    <div class="uk-navbar-center">#}
+{#        <a href="#">#}
+{#            <img src="{{ asset('images/eni-logo.png') }}" alt="Logo" style="height:40px;">#}
+{#        </a>#}
+{#    </div>#}
+
+{#    <div class="uk-navbar-right">#}
+{#        <ul class="uk-navbar-nav">#}
+{#            <li>#}
+{#                <a href="#"><span uk-icon="user" ratio="1.3"></span></a>#}
+{#                <div class="uk-navbar-dropdown">#}
+{#                    <ul class="uk-nav uk-navbar-dropdown-nav">#}
+{#                        <li class="uk-active"><a href="#">Active</a></li>#}
+{#                        <li><a href="#">Item</a></li>#}
+{#                        <li class="uk-nav-header">Header</li>#}
+{#                        <li><a href="#">Item</a></li>#}
+{#                        <li><a href="#">Item</a></li>#}
+{#                        <li class="uk-nav-divider"></li>#}
+{#                        <li><a href="#">Item</a></li>#}
+{#                    </ul>#}
+{#                </div>#}
+{#            </li>#}
+{#        </ul>#}
+{#    </div>#}
+{#</nav>#}
