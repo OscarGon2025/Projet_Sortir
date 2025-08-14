@@ -3,59 +3,149 @@
 {% block title %}Log in!{% endblock %}
 
 {% block body %}
-    <div class="uk-section uk-flex uk-flex-middle uk-animation-fade" uk-height-viewport>
-        <div class="uk-width-1-1">
-            <div class="uk-container">
-                <div class="uk-grid-margin uk-grid uk-grid-stack" uk-grid>
-                    <div class="uk-width-1-1@m">
-                        <div class="uk-margin uk-width-large uk-margin-auto uk-card uk-card-default uk-card-body uk-box-shadow-large">
-                            <h3 class="uk-card-title uk-text-center">Welcome back!</h3>
-                            <form method="post">
 
-                                {% if error %}
-                                    <div class="uk-alert-danger" uk-alert>
-                                        <a href class="uk-alert-close" uk-close></a>
-                                        <p>{{ error.messageKey|trans(error.messageData, 'security') }}</p>
-                                    </div>
-                                {% endif %}
 
-                                {# Veut dire si je suis connecté ou pas #}
-                                {% if app.user %}
-                                    <div class="uk-alert-primary" uk-alert>
-                                        <a href class="uk-alert-close" uk-close></a>
-                                        <p> You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a></p>
-                                    </div>
-                                {% endif %}
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Login - UIkit 3 KickOff</title>
+		<link rel="icon" href="img/favicon.ico">
+		<!-- CSS FILES -->
+		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/uikit@latest/dist/css/uikit.min.css">
+		<link rel="stylesheet" type="text/css" href="../../assets/styles/login-dark.css">
+	</head>
+	<body class="login uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-height-viewport uk-overflow-hidden uk-light" data-uk-height-viewport>
+		<!-- overlay -->
+		<div class="uk-position-cover uk-overlay-primary"></div>
+		<!-- /overlay -->
+		<div class="uk-position-bottom-center uk-position-small uk-visible@m uk-position-z-index">
+			<span class="uk-text-small uk-text-muted">© 2019 Company Name - <a href="https://github.com/zzseba78/Kick-Off">Created by KickOff</a> | Built with <a href="http://getuikit.com" title="Visit UIkit 3 site" target="_blank" data-uk-tooltip><span data-uk-icon="uikit"></span></a></span>
+		</div>
+		<div class="uk-width-medium uk-padding-small uk-position-z-index" uk-scrollspy="cls: uk-animation-fade">
 
-                                <div class="uk-margin">
-                                    <div class="uk-inline uk-width-1-1">
-                                        <span class="uk-form-icon" uk-icon="icon: mail"></span>
-                                        <input class="uk-input uk-form-large" type="text"  value="{{ last_username }}" name="username">
-                                    </div>
-                                </div>
-                                <div class="uk-margin">
-                                    <div class="uk-inline uk-width-1-1">
-                                        <span class="uk-form-icon" uk-icon="icon: lock"></span>
-                                        <input class="uk-input uk-form-large" type="password" name="password">
-                                    </div>
-                                </div>
-                                <div class="uk-margin">
-                                    <label>
-                                        <input class="uk-checkbox" type="checkbox" name="_remember_me"> Remember me
-                                    </label>
-                                </div>
-                                <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
-                                <div class="uk-margin">
-                                    <button class="uk-button uk-button-primary uk-button-large uk-width-1-1" type="submit">Login</button>
-                                </div>
-                                <div class="uk-text-small uk-text-center">
+			<div class="uk-text-center uk-margin">
+				<img src="img/login-logo.svg" alt="Logo">
+			</div>
+
+			<!-- login -->dark
+			<form class="toggle-class" action="/">
+				<fieldset class="uk-fieldset">
+					<div class="uk-margin-small">
+						<div class="uk-inline uk-width-1-1">
+							<span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: user"></span>
+							<input class="uk-input uk-border-pill" required placeholder="Username" type="text">
+						</div>
+					</div>
+					<div class="uk-margin-small">
+						<div class="uk-inline uk-width-1-1">
+							<span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
+							<input class="uk-input uk-border-pill" required placeholder="Password" type="password">
+						</div>
+					</div>
+					<div class="uk-margin-small">
+						<label><input class="uk-checkbox" type="checkbox"> Keep me logged in</label>
+					</div>
+					<div class="uk-margin-bottom">
+						<button type="submit" class="uk-button uk-button-primary uk-border-pill uk-width-1-1">LOG IN</button>
+					</div>
+				</fieldset>
+			</form>
+			<!-- /login -->
+
+			<!-- recover password -->
+			<form class="toggle-class" action="app_main" hidden>
+				<div class="uk-margin-small">
+					<div class="uk-inline uk-width-1-1">
+						<span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: mail"></span>
+						<input class="uk-input uk-border-pill" placeholder="E-mail" required type="text">
+					</div>
+				</div>
+				<div class="uk-margin-bottom">
+					<button type="submit" class="uk-button uk-button-primary uk-border-pill uk-width-1-1">SEND PASSWORD</button>
+				</div>
+			</form>
+			<!-- /recover password -->
+
+			<!-- action buttons -->
+			<div>
+				<div class="uk-text-center">
+					<a class="uk-link-reset uk-text-small toggle-class" data-uk-toggle="target: .toggle-class ;animation: uk-animation-fade">Forgot your password?</a>
+					<a class="uk-link-reset uk-text-small toggle-class" data-uk-toggle="target: .toggle-class ;animation: uk-animation-fade" hidden><span data-uk-icon="arrow-left"></span> Back to Login</a>
+				</div>
+			</div>
+			<!-- action buttons -->
+		</div>
+
+		<!-- JS FILES -->
+		<script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit-icons.min.js"></script>
+	</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+{#    <div class="uk-section uk-flex uk-flex-middle uk-animation-fade" uk-height-viewport>#}
+{#        <div class="uk-width-1-1">#}
+{#            <div class="uk-container">#}
+{#                <div class="uk-grid-margin uk-grid uk-grid-stack" uk-grid>#}
+{#                    <div class="uk-width-1-1@m">#}
+{#                        <div class="uk-margin uk-width-large uk-margin-auto uk-card uk-card-default uk-card-body uk-box-shadow-large">#}
+{#                            <h3 class="uk-card-title uk-text-center">Welcome back!</h3>#}
+{#                            <form method="post">#}
+
+{#                                {% if error %}#}
+{#                                    <div class="uk-alert-danger" uk-alert>#}
+{#                                        <a href class="uk-alert-close" uk-close></a>#}
+{#                                        <p>{{ error.messageKey|trans(error.messageData, 'security') }}</p>#}
+{#                                    </div>#}
+{#                                {% endif %}#}
+
+{#                                #}{# Veut dire si je suis connecté ou pas #}
+{#                                {% if app.user %}#}
+{#                                    <div class="uk-alert-primary" uk-alert>#}
+{#                                        <a href class="uk-alert-close" uk-close></a>#}
+{#                                        <p> You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a></p>#}
+{#                                    </div>#}
+{#                                {% endif %}#}
+
+{#                                <div class="uk-margin">#}
+{#                                    <div class="uk-inline uk-width-1-1">#}
+{#                                        <span class="uk-form-icon" uk-icon="icon: mail"></span>#}
+{#                                        <input class="uk-input uk-form-large" type="text"  value="{{ last_username }}" name="username">#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                                <div class="uk-margin">#}
+{#                                    <div class="uk-inline uk-width-1-1">#}
+{#                                        <span class="uk-form-icon" uk-icon="icon: lock"></span>#}
+{#                                        <input class="uk-input uk-form-large" type="password" name="password">#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                                <div class="uk-margin">#}
+{#                                    <label>#}
+{#                                        <input class="uk-checkbox" type="checkbox" name="_remember_me"> Remember me#}
+{#                                    </label>#}
+{#                                </div>#}
+{#                                <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">#}
+{#                                <div class="uk-margin">#}
+{#                                    <button class="uk-button uk-button-primary uk-button-large uk-width-1-1" type="submit">Login</button>#}
+{#                                </div>#}
+{#                                <div class="uk-text-small uk-text-center">#}
 {#                                    Not registered? <a href="{{ path('app_register') }}">Create an account</a>#}
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+{#                                </div>#}
+{#                            </form>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
 {% endblock %}

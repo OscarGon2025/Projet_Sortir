@@ -1,20 +1,73 @@
+
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="stylesheet" href="{{ asset('vendor/uikit/css/uikit.min.css') }}">
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cover - UIkit 3 KickOff</title>
+    <link rel="icon" href="favicon.ico">
+    <!-- CSS FILES -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/uikit@latest/dist/css/uikit.min.css">
+    <style>
+        .lead {
+            font-size: 1.175em;
+            font-weight: 300;
+        }
+        .uk-logo img {
+            height: 28px;
+        }
+    </style>
+</head>
 
-        {% block stylesheets %}
-        {% endblock %}
 
-        <script src="{{ asset('vendor/uikit/js/uikit.js') }}"></script>
-        <script src="{{ asset('vendor/uikit/js/uikit-icons.js') }}"></script>
+<!-- OFFCANVAS -->
+<div id="offcanvas-nav" data-uk-offcanvas="flip: true; overlay: false">
+    <div class="uk-offcanvas-bar uk-offcanvas-bar-animation uk-offcanvas-slide">
+        <button class="uk-offcanvas-close uk-close uk-icon" type="button" data-uk-close></button>
+        <ul class="uk-nav uk-nav-default">
+            <li class="uk-active"><a href="#">Active</a></li>
+            <li class="uk-parent">
+                <a href="#">Parent</a>
+                <ul class="uk-nav-sub">
+                    <li><a href="#">Sub item</a></li>
+                    <li><a href="#">Sub item</a></li>
+                </ul>
+            </li>
+            <li class="uk-nav-header">Header</li>
+            <li><a href="#js-options"><span class="uk-margin-small-right uk-icon" data-uk-icon="icon: table"></span> Item</a></li>
+            <li><a href="#"><span class="uk-margin-small-right uk-icon" data-uk-icon="icon: thumbnails"></span> Item</a></li>
+            <li class="uk-nav-divider"></li>
+            <li><a href="#"><span class="uk-margin-small-right uk-icon" data-uk-icon="icon: trash"></span> Item</a></li>
+        </ul>
+        <h3>Title</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+    </div>
+</div>
+<!-- /OFFCANVAS -->
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
+
+{#    <head>#}
+{#        <meta charset="UTF-8">#}
+{#        <title>{% block title %}Welcome!{% endblock %}</title>#}
+{#        <link rel="stylesheet" href="{{ asset('vendor/uikit/css/uikit.min.css') }}">#}
+
+{#        {% block stylesheets %}#}
+{#        {% endblock %}#}
+
+{#        <script src="{{ asset('vendor/uikit/js/uikit.js') }}"></script>#}
+{#        <script src="{{ asset('vendor/uikit/js/uikit-icons.js') }}"></script>#}
+
+{#        {% block javascripts %}#}
+{#            {% block importmap %}{{ importmap('app') }}{% endblock %}#}
+{#        {% endblock %}#}
+{#    </head>#}
+
+<!-- JS FILES -->
+<script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit-icons.min.js"></script>
+
+
+
     <body>
     {% include 'navbar.html.twig' %}
         {% block body %}{% endblock %}
