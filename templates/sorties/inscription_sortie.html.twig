@@ -1,0 +1,15 @@
+{% extends '../base.html.twig' %}
+
+{% block title %}
+    {{ parent() }} | S'inscrire à une sortie
+{% endblock %}
+
+{% block body %}
+
+    {% if sortie.etat == 'ouverte' and sortie.dateLimiteInscription > "now"|date("Y-m-d H:i:s") %}
+        <a href="{{ path('sortie_inscription', { id: sortie.id }) }}" class="btn btn-success">S'inscrire</a>
+    {% else %}
+        <button class="btn btn-secondary" disabled>Inscriptions fermées</button>
+    {% endif %}
+
+{% endblock %}

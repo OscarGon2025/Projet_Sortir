@@ -19,7 +19,7 @@ final class SortieController extends AbstractController
     #[Route('/sorties', name: 'app_sorties')]
     public function indexSorties(): Response
     {
-        return $this->render('sorties/index.html.twig', [
+        return $this->render('sorties/list.html.twig', [
             'controller_name' => 'SortieController',
         ]);
     }
@@ -56,12 +56,40 @@ final class SortieController extends AbstractController
     public function list(sortieRepository $repository): Response
     {
         $sorties = $repository->findAll();
-        return $this->render('sortie/index.html.twig', [
+        return $this->render('sortie/list_sortie.html.twig', [
             'sorties' => $sorties,
         ]);
     }
 
 
+    #[Route('/sortie/{id}/inscription', name: 'sortie_inscription', methods: ['GET', 'POST'])]
+    public function inscription(int $id, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        $sortie = $em->getRepository(Sortie::class)->find($id);
 
+        if(!$sortie) {
+            throw $this->createNotFoundException("La sortie n'existe pas ou n'est pas trouvée.");
+        }
+        $maintenant = new \DateTimeImmutable();
 
+        //Condition 1 : Statut de la sortie doit être "ouverte"
+        if ($sortie->getEtat()->getLibelle() === 'Ouverte') {
+            $this->addFlash('error', "Cette sortie n'est pas ouverte aux inscriptions.");
+            return $this->redirectToRoute('app_sorties');
+    }
+        //Condition 2 : La date limite ne doit pas être dépassée
+        if($sortie->getDateLimiteInscription() < $maintenant) {
+            $this->addFlash('error', "La date limite d'inscription est dépassée.");
+            return $this->redirectToRoute('app_sorties');
+        }
+
+        // Conditions remplies pour l'inscription : ManyToMany entre User et Sortie
+        $sortie->addUser($user);
+        $em->persist($sortie);
+        $em->flush();
+
+        $this->addFlash('success', 'Inscription réussie à la sortie !');
+        return $this->redirectToRoute('app_sorties');
+    }
 }
