@@ -1,4 +1,5 @@
-{#{% extends 'base.html.twig' %}#}
+{% extends 'base.html.twig' %}
+
 
 {#{% block title %}list sortie{% endblock %}#}
 
@@ -30,6 +31,13 @@
 {% block body %}
     <h1>Liste des sorties</h1>
 
+<br>
+    {{ form_start(formFiltre) }}
+    {{ form_row(formFiltre.site) }}
+    <button type="submit">Filtrer</button>
+    {{ form_end(formFiltre) }}
+</br>
+
     {% for sortie in sorties %}
         <div class="sortie-item">
             <h3>{{ sortie.nom }}</h3>
@@ -54,4 +62,9 @@
     {% else %}
         <p>Aucune sortie disponible.</p>
     {% endfor %}
+
+
+   
+
+
 {% endblock %}

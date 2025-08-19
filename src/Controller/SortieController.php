@@ -6,9 +6,11 @@ namespace App\Controller;
 use App\Entity\Site;
 use App\Entity\Etat;
 use App\Entity\Sortie;
+use App\Form\FiltreSiteType;
 use App\Form\SortieType;
 use App\Repository\SortieRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use http\Client\Curl\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,12 +33,14 @@ final class SortieController extends AbstractController
 
         // Assigner l’organisateur connecté
         $user = $this->getUser();
+
         if (!$user) {
             throw $this->createAccessDeniedException('Vous devez être connecté pour créer une sortie.');
         }
         $sortie->setOrganisateur($user);
 
         $form = $this->createForm(SortieType::class, $sortie);
+
         $form->handleRequest($request);
 
         if (!$sortie->getDateCreated()) {
@@ -59,12 +63,29 @@ final class SortieController extends AbstractController
         ]);
     }
 
-    #[Route('/sortie-list', name: 'app_sortie', methods: ['GET'])]
-    public function list(sortieRepository $repository): Response
+    #[Route('/sortie-list', name: 'app_sortie', methods: ['GET', 'POST'])]
+    public function list(Request $request, SortieRepository $sortieRepository): Response
     {
-        $sorties = $repository->findAll();
+
+        $formFiltre = $this->createForm(FiltreSiteType::class);
+        $formFiltre->handleRequest($request);
+
+        if ($formFiltre->isSubmitted() && $formFiltre->isValid()) {
+            $site = $formFiltre->get('site')->getData(); // récupère l'objet Site sélectionné
+            $sorties = $sortieRepository->findBySite($site ? $site->getId() : null);
+        } else {
+            $sorties = $sortieRepository->findAll();
+        }
+
+
         return $this->render('sorties/list.html.twig', [
+
+        $sorties = $repository->findAll();
+
+        return $this->render('sorties/list.html.twig', [
+
             'sorties' => $sorties,
+            'formFiltre' => $formFiltre->createView(), // <-- ici
         ]);
     }
 
@@ -111,8 +132,10 @@ final class SortieController extends AbstractController
 
         $maintenant = new \DateTimeImmutable();
 
+
         // Condition 1 : La sortie doit être ouverte
         if ($sortie->getEtat()->getLibelle() !== 'Ouverte') {
+
             $this->addFlash('error', "Cette sortie n'est pas ouverte aux inscriptions.");
             return $this->redirectToRoute('app_sortie');
         }
