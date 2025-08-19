@@ -31,7 +31,17 @@
         </div>
         <!-- /TEXT -->
 
+
+
+
     </div>
+
+    {% if app.user %}
+        <p>Bienvenue {{ app.user.username }}</p>
+    {% else %}
+        <p>Bienvenue invité</p>
+    {% endif %}
+
 
 </div>
     {% endblock %}

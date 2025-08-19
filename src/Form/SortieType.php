@@ -35,13 +35,14 @@ class SortieType extends AbstractType
             ->add('siteOrganisateur', EntityType::class, [
                 'class' => Site::class,
                 'choice_label' => 'nom',
+                'placeholder' => 'Choisissez un site',
                 'label' => 'Site Organisateur',
             ])
-            ->add('lieu', EntityType::class, [
-                'class' => Lieu::class,
-                'choice_label' => 'nom',
+            ->add('lieu', LieuType::class, [
+                'label' => 'Lieu',
             ]);
     }
+
 
     public function configureOptions(OptionsResolver $resolver): void
     {

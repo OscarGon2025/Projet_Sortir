@@ -1,10 +1,16 @@
-{% extends '../base.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}list sortie{% endblock %}
 
 {% block body %}
 
     <h1>Liste des sorties</h1>
+
+    {{ form_start(formFiltre) }}
+    {{ form_row(formFiltre.site) }}
+    <button type="submit">Filtrer</button>
+    {{ form_end(formFiltre) }}
+
     <ul>
         {% for sortie in sorties %}
             <li>
@@ -12,13 +18,16 @@
                 ({{ sortie.dateHeureDebut|date('d/m/Y H:i') }})
                 {{ sortie.etat.libelle }}
                 {{ sortie.siteOrganisateur.nom }}
-                {{ sortie.Lieu.nom }}
+                {{ sortie.lieu.nom }}
                 ({{ sortie.dateLimiteInscription|date('d/m/Y H:i') }})
                 ({{ sortie.nbInscriptionsMax }})
                 ({{ sortie.duree }})
                 ({{ sortie.organisateur.nom }})
             </li>
+        {% else %}
+            <li>Aucune sortie trouvée</li>
         {% endfor %}
     </ul>
+
 
 {% endblock %}

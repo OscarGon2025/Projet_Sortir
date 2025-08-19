@@ -31,9 +31,15 @@
             <div class="uk-navbar-right">
                 <ul class="uk-navbar-nav">
                     <li class="uk-active uk-visible@m"><a href="/" data-uk-icon="home"></a></li>
-                    <li class="uk-visible@s"><a href="">Qui Sommes nous?</a></li>
-                    <li class="uk-visible@s"><a href="/login">Login</a></li>
+                    <li class="uk-visible@s"><a href="">Qui Sommes nous</a></li>
+                    {% if app.user %}
+                        <li><a href="{{ path('app_logout') }}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{{ path('app_login') }}">Login</a></li>
+                    {% endif %}
                     <li class="uk-visible@s"><a href="/sortie-create">Create</a></li>
+                    <li class="uk-visible@s"><a href="/sortie-list">List</a></li>
+
                     <li><a class="uk-navbar-toggle" data-uk-toggle data-uk-navbar-toggle-icon href="#offcanvas-nav"></a></li>
                 </ul>
             </div>
