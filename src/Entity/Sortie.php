@@ -96,8 +96,10 @@ class Sortie
     }
     public function removeUser(User $user): static
     {
-        if ($this->users->removeElement($user)) {
-            // optionnel: détacher aussi côté User
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+            // Supprime aussi la sortie dans la collection estInscrit de User
+            $user->removeEstInscrit($this);
         }
         return $this;
     }

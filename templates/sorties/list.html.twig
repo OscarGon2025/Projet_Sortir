@@ -1,33 +1,70 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}list sortie{% endblock %}
+
+{#{% block title %}list sortie{% endblock %}#}
+
+{#{% block body %}#}
+
+{#    <h1>Liste des sorties</h1>#}
+{#    <ul>#}
+{#        {% for sortie in sorties %}#}
+{#            <li>#}
+{#                {{ sortie.nom }}#}
+{#                ({{ sortie.dateHeureDebut|date('d/m/Y H:i') }})#}
+{#                {{ sortie.etat.libelle }}#}
+{#                {{ sortie.siteOrganisateur.nom }}#}
+{#                {{ sortie.Lieu.nom }}#}
+{#                ({{ sortie.dateLimiteInscription|date('d/m/Y H:i') }})#}
+{#                ({{ sortie.nbInscriptionsMax }})#}
+{#                ({{ sortie.duree }})#}
+{#                ({{ sortie.organisateur.nom }})#}
+{#            </li>#}
+{#        {% endfor %}#}
+{#    </ul>#}
+
+{#{% endblock %}#}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des sorties{% endblock %}
 
 {% block body %}
-
     <h1>Liste des sorties</h1>
 
+<br>
     {{ form_start(formFiltre) }}
     {{ form_row(formFiltre.site) }}
     <button type="submit">Filtrer</button>
     {{ form_end(formFiltre) }}
+</br>
 
-    <ul>
-        {% for sortie in sorties %}
-            <li>
-                {{ sortie.nom }}
-                ({{ sortie.dateHeureDebut|date('d/m/Y H:i') }})
-                {{ sortie.etat.libelle }}
-                {{ sortie.siteOrganisateur.nom }}
-                {{ sortie.lieu.nom }}
-                ({{ sortie.dateLimiteInscription|date('d/m/Y H:i') }})
-                ({{ sortie.nbInscriptionsMax }})
-                ({{ sortie.duree }})
-                ({{ sortie.organisateur.nom }})
-            </li>
-        {% else %}
-            <li>Aucune sortie trouvée</li>
-        {% endfor %}
-    </ul>
+    {% for sortie in sorties %}
+        <div class="sortie-item">
+            <h3>{{ sortie.nom }}</h3>
+            <p><strong>État :</strong> {{ sortie.etat.libelle }}</p>
+            <p><strong>Lieu de la sortie :</strong> {{ sortie.Lieu.nom }}</p>
+            <p><strong>Organisateur :</strong> {{ sortie.organisateur.username }}</p>
+            <p><strong>Date limite inscription :</strong>
+                {{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y H:i') : 'Non définie' }}
+            </p>
+            <p><strong>Participants inscrits :</strong> {% if sortie.users|length > 0 %}
+            <ul>
+                {% for user in sortie.users %}
+                    <li>{{ user.username }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+                <p>Aucun utilisateur inscrit pour l'instant.</p>
+            {% endif %} </p>
+            <a href="{{ path('sortie_show', { id: sortie.id }) }}" class="btn btn-primary">Voir détails / S'inscrire</a>
+        </div>
+        <hr>
+    {% else %}
+        <p>Aucune sortie disponible.</p>
+    {% endfor %}
+
+
+   
 
 
 {% endblock %}

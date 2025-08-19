@@ -1,15 +1,44 @@
-{% extends '../base.html.twig' %}
+{#{% extends 'base.html.twig' %}#}
+
+{#{% block title %}#}
+{#    {{ parent() }} | S'inscrire à une sortie#}
+{#{% endblock %}#}
+
+{#{% block body %}#}
+
+{#    {% if sortie.etat == 'ouverte' and sortie.dateLimiteInscription > "now"|date("Y-m-d H:i:s") %}#}
+{#        <a href="{{ path('sortie_inscription', { id: sortie.id }) }}" class="btn btn-success">S'inscrire</a>#}
+{#    {% else %}#}
+{#        <button class="btn btn-secondary" disabled>Inscriptions fermées</button>#}
+{#    {% endif %}#}
+
+{#{% endblock %}#}
+
+
+{# templates/sorties/show.html.twig #}
+{% extends 'base.html.twig' %}
 
 {% block title %}
-    {{ parent() }} | S'inscrire à une sortie
+    {{ parent() }} | S'inscrire à la sortie
 {% endblock %}
 
 {% block body %}
+    <h1>{{ sortie.nom }}</h1>
 
-    {% if sortie.etat == 'ouverte' and sortie.dateLimiteInscription > "now"|date("Y-m-d H:i:s") %}
-        <a href="{{ path('sortie_inscription', { id: sortie.id }) }}" class="btn btn-success">S'inscrire</a>
+    <p><strong>État :</strong> {{ sortie.etat.libelle }}</p>
+    <p><strong>Date limite d'inscription :</strong>
+        {{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y H:i') : 'Non définie' }}
+    </p>
+
+    {% set etat = sortie.etat.libelle|lower %}
+    {% set limite = sortie.dateLimiteInscription %}
+
+    {% if etat == 'ouverte' and limite > "now"|date("Y-m-d H:i:s") %}
+        <form action="{{ path('sortie_inscription', { id: sortie.id }) }}" method="POST">
+            <button type="submit" class="btn btn-success">S'inscrire</button>
+        </form>
     {% else %}
         <button class="btn btn-secondary" disabled>Inscriptions fermées</button>
     {% endif %}
-
 {% endblock %}
+
