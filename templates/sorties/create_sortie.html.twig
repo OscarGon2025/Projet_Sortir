@@ -1,29 +1,153 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}
-    {{ parent() }} | Créer une sortie
-{% endblock %}
+{% block title %}{{ parent() }} | Créer une sortie{% endblock %}
 
 {% block body %}
+    <div class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-height-viewport uk-overflow-hidden uk-light" data-uk-height-viewport>
 
-    <body>
+        <!-- overlay sombre -->
+        <div class="uk-position-cover uk-overlay-primary"></div>
 
+        <div class="uk-width-xlarge uk-padding-small uk-position-z-index" uk-scrollspy="cls: uk-animation-fade">
 
-    <h1>Create Sortie</h1>
+            <div class="uk-text-center uk-margin">
+                <h1 class="uk-heading-line uk-text-bold"><span>Créer une Sortie</span></h1>
+            </div>
 
-    {# Ouvrir le formulaire #}
-    {{ form_start(sortieForm) }}
+            <!-- Formulaire de sortie -->
+            {{ form_start(sortieForm, {'attr': {'class': 'uk-form-stacked'}}) }}
+            <fieldset class="uk-fieldset">
 
-    {# Afficher tout les champs #}
-    {{ form_widget(sortieForm) }}
+                <div class="uk-margin">
+                    {{ form_label(sortieForm.nom, 'Nom', {'label_attr': {'class': 'uk-form-label'}}) }}
+                    {{ form_widget(sortieForm.nom, {'attr': {'class': 'uk-input uk-border-pill'}}) }}
+                </div>
 
+                <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
+                    <div>
+                        {{ form_label(sortieForm.dateHeureDebut, 'Date début', {'label_attr': {'class': 'uk-form-label'}}) }}
+                        {{ form_widget(sortieForm.dateHeureDebut, {'attr': {'class': 'uk-input uk-border-pill'}}) }}
+                    </div>
+                    <div>
+                        {{ form_label(sortieForm.duree, 'Durée (min)', {'label_attr': {'class': 'uk-form-label'}}) }}
+                        {{ form_widget(sortieForm.duree, {'attr': {'class': 'uk-input uk-border-pill'}}) }}
+                    </div>
+                </div>
 
-    <div class="uk-margin">
-        <button type="submit" class="uk-button uk-button-primary uk-width-1-1 uk-margin-small-bottom">Save</button>
+                <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
+                    <div>
+                        {{ form_label(sortieForm.dateLimiteInscription, 'Date limite inscription', {'label_attr': {'class': 'uk-form-label'}}) }}
+                        {{ form_widget(sortieForm.dateLimiteInscription, {'attr': {'class': 'uk-input uk-border-pill'}}) }}
+                    </div>
+                    <div>
+                        {{ form_label(sortieForm.nbInscriptionsMax, 'Nb max participants', {'label_attr': {'class': 'uk-form-label'}}) }}
+                        {{ form_widget(sortieForm.nbInscriptionsMax, {'attr': {'class': 'uk-input uk-border-pill'}}) }}
+                    </div>
+                </div>
+
+                <div class="uk-margin">
+                    {{ form_label(sortieForm.infoSortie, 'Info sortie', {'label_attr': {'class': 'uk-form-label'}}) }}
+                    {{ form_widget(sortieForm.infoSortie, {'attr': {'class': 'uk-textarea uk-border-rounded'}}) }}
+                </div>
+
+                <div class="uk-margin">
+                    {{ form_label(sortieForm.etat, 'État', {'label_attr': {'class': 'uk-form-label'}}) }}
+                    {{ form_widget(sortieForm.etat, {'attr': {'class': 'uk-select uk-border-pill'}}) }}
+                </div>
+
+                <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
+                    <div>
+                        {{ form_label(sortieForm.siteOrganisateur, 'Site organisateur', {'label_attr': {'class': 'uk-form-label'}}) }}
+                        <div class="uk-form-controls">
+                            {{ form_widget(sortieForm.siteOrganisateur, {'attr': {'class': 'uk-select uk-border-pill'}}) }}
+                        </div>
+                    <div>
+                        {{ form_label(sortieForm.lieu, 'Lieu', {'label_attr': {'class': 'uk-form-label'}}) }}
+                        <div class="uk-flex">
+                            {{ form_widget(sortieForm.lieu, {'attr': {'class': 'uk-select uk-border-pill'}}) }}
+                            <button type="button" class="uk-button uk-button-secondary uk-border-pill uk-margin-small-left" uk-toggle="target: #modal-lieu">
+                                + Nouveau
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Détails du lieu -->
+                <div id="lieu-details"
+                     class="uk-alert-primary uk-padding-small uk-border-rounded uk-margin"
+                     style="display:none"
+                     data-url-template="{{ path('lieu_details', {id: 0})|replace({'0':'__ID__'}) }}">
+                </div>
+
+                <div class="uk-margin">
+                    <button type="submit" class="uk-button uk-button-primary uk-border-pill uk-width-1-1">
+                        Enregistrer la sortie
+                    </button>
+                </div>
+            </fieldset>
+            {{ form_end(sortieForm) }}
+
+        </div>
     </div>
 
-    {# Fermer le formulaire #}
-    {{ form_end(sortieForm) }}
-    </body>
-{% endblock %}
+    <!-- Modale UIkit -->
+    <div id="modal-lieu" uk-modal>
+        <div class="uk-modal-dialog uk-modal-body uk-border-rounded">
+            <button class="uk-modal-close-default" type="button" uk-close></button>
+            <h2 class="uk-modal-title">Ajouter un Lieu</h2>
 
+            {{ form_start(lieuForm, {'attr': {'class': 'uk-form-stacked'}}) }}
+            {{ form_widget(lieuForm) }}
+            <div class="uk-margin uk-text-right">
+                <button type="button" class="uk-button uk-button-default uk-border-pill uk-modal-close">Annuler</button>
+                <button type="submit" class="uk-button uk-button-primary uk-border-pill">Enregistrer</button>
+            </div>
+            {{ form_end(lieuForm) }}
+        </div>
+    </div>
+
+    <!-- JS UIkit -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit-icons.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const selectLieu = document.querySelector('select[name$="[lieu]"]');
+            const detailsBox = document.getElementById('lieu-details');
+            const urlTemplate = detailsBox ? detailsBox.dataset.urlTemplate : '';
+
+            async function loadDetails(id) {
+                if (!detailsBox || !id || !urlTemplate) {
+                    detailsBox.style.display = 'none';
+                    detailsBox.innerHTML = '';
+                    return;
+                }
+                try {
+                    const url = urlTemplate.replace('__ID__', encodeURIComponent(id));
+                    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                    if (!res.ok) throw new Error('Failed to load');
+                    const d = await res.json();
+
+                    const parts = [];
+                    if (d.nom) parts.push(`<strong>Nom:</strong> ${d.nom}`);
+                    if (d.rue) parts.push(`<strong>Rue:</strong> ${d.rue}`);
+                    const ville = [d.codePostal, d.ville].filter(Boolean).join(' ');
+                    if (ville) parts.push(`<strong>Ville:</strong> ${ville}`);
+                    const coords = [d.latitude, d.longitude].filter(Boolean).join(', ');
+                    if (coords) parts.push(`<strong>Coord.:</strong> ${coords}`);
+
+                    detailsBox.innerHTML = parts.join('<br>');
+                    detailsBox.style.display = parts.length ? 'block' : 'none';
+                } catch {
+                    detailsBox.style.display = 'none';
+                    detailsBox.innerHTML = '';
+                }
+            }
+
+            if (selectLieu) {
+                if (selectLieu.value) loadDetails(selectLieu.value);
+                selectLieu.addEventListener('change', () => loadDetails(selectLieu.value));
+            }
+        });
+    </script>
+{% endblock %}

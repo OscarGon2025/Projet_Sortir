@@ -60,9 +60,20 @@ class Sortie
     #[ORM\JoinColumn(nullable: false)]
     private ?Site $siteOrganisateur = null;
 
-    #[ORM\ManyToOne(targetEntity: Lieu::class, cascade: ['persist'])]
+    #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Lieu $Lieu = null;
+    private ?Lieu $lieu = null;
+
+    public function getLieu(): ?Lieu
+    {
+        return $this->lieu;
+    }
+
+    public function setLieu(?Lieu $lieu): self
+    {
+        $this->lieu = $lieu;
+        return $this;
+    }
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
@@ -201,18 +212,6 @@ class Sortie
     public function setSiteOrganisateur(?Site $siteOrganisateur): static
     {
         $this->siteOrganisateur = $siteOrganisateur;
-
-        return $this;
-    }
-
-    public function getLieu(): ?Lieu
-    {
-        return $this->Lieu;
-    }
-
-    public function setLieu(?Lieu $Lieu): static
-    {
-        $this->Lieu = $Lieu;
 
         return $this;
     }

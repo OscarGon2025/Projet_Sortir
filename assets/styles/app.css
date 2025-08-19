@@ -1,0 +1,151 @@
+
+
+/* Background Image Media Queries */
+body.create {
+    background-image: url('https://picsum.photos/640/700/?image=1044');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+@media screen and (min-width: 640px){
+    body.create {
+        background-image: url('https://picsum.photos/960/700/?image=1044');
+    }
+}
+@media screen and (min-width: 960px){
+    body.create {
+        background-image: url('https://picsum.photos/1200/900/?image=1044');
+    }
+}
+@media screen and (min-width: 1200px){
+    body.create {
+        background-image: url('https://picsum.photos/1600/950/?image=1044');
+    }
+}
+@media screen and (min-width: 1600px){
+    body.create {
+        background-image: url('https://picsum.photos/2000/1050/?image=1044');
+    }
+}
+
+
+
+
+
+
+
+/* --- Boîte détails du lieu --- */
+.box-lieu-details {
+    margin: 1rem 0 .5rem 0;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(145deg, #f9f9fc, #f3f3f8);
+    border: 1px solid #e0e0eb;
+    border-radius: .65rem;
+    white-space: pre-wrap;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: .95rem;
+    line-height: 1.5;
+    color: #333;
+    transition: background .25s ease, box-shadow .25s ease;
+}
+.box-lieu-details:hover {
+    background: #f0f0f9;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+
+/* --- Rangée d’actions --- */
+.action-row {
+    display: flex;
+    gap: .75rem;
+    margin: .75rem 0 1.25rem;
+    flex-wrap: wrap; /* responsive: si pas de place ça passe à la ligne */
+}
+
+/* --- Boutons génériques --- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .55rem 1rem;
+    border: 1px solid transparent;
+    border-radius: .5rem;
+    background: #f8f9fa;
+    cursor: pointer;
+    font-size: .9rem;
+    font-weight: 500;
+    transition: all .25s ease;
+}
+.btn:hover {
+    background: #f1f3f5;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+.btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* --- Variantes de boutons --- */
+.btn-primary {
+    background: #1e87f0;
+    border-color: #1876d1;
+    color: #fff;
+}
+.btn-primary:hover { background: #176ac2; }
+
+.btn-secondary {
+    background: #e9ecef;
+    color: #212529;
+}
+.btn-secondary:hover { background: #dde1e4; }
+
+.btn-danger {
+    background: #dc3545;
+    border-color: #bd2130;
+    color: #fff;
+}
+.btn-danger:hover { background: #c82333; }
+
+/* Bouton inline (ex: à côté d’un select) */
+.btn-inline {
+    margin-left: .5rem;
+    padding: .45rem .8rem;
+    font-size: .85rem;
+}
+
+/* --- Modale --- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(16, 16, 24, .55);
+    backdrop-filter: blur(4px); /* ✨ effet vitre floue moderne */
+    z-index: 1000;
+    transition: opacity .3s ease;
+}
+.modal-overlay.is-open {
+    display: flex;
+    animation: fadeIn .3s ease forwards;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-dialog {
+    background: #fff;
+    width: min(640px, 94vw);
+    max-height: 90vh;
+    border-radius: .7rem;
+    box-shadow: 0 12px 42px rgba(0,0,0,.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp .35s ease;
+}
+@keyframes slideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
