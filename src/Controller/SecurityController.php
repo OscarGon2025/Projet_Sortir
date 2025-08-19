@@ -113,4 +113,18 @@ final class SecurityController extends AbstractController
         ]);
     }
 
+    #[Route('/user/{id}', name: 'user_profile_public', methods: ['GET'])]
+    public function publicProfile(int $id, EntityManagerInterface $em): Response
+    {
+        $user = $em->getRepository(User::class)->find($id);
+
+        if (!$user) {
+            throw $this->createNotFoundException("Utilisateur non trouvé.");
+        }
+
+        return $this->render('profile/public_profile.html.twig', [
+            'user' => $user,
+        ]);
+    }
+
 }

@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la sortie{% endblock %}
+
+{% block body %}
+    <h1>{{ sortie.nom }}</h1>
+    <p><strong>État :</strong> {{ sortie.etat.libelle }}</p>
+    <p><strong>Places disponibles :</strong> {{ sortie.nbInscriptionsMax }}</p>
+    <p><strong>Places restantes :</strong> {{ sortie.nbInscriptionsMax - (sortie.users | length) }}</p>
+    <p><strong>Organisateur :</strong> {{ sortie.organisateur.username }}</p>
+    <p><strong>Date limite d'inscription :</strong>
+        {{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y H:i') : 'Non définie' }}</p>
+
+    {% set inscrit = sortie.users|length > 0 %}
+
+    {% if sortie.etat.libelle|lower == 'ouverte' and sortie.dateLimiteInscription > "now"|date("Y-m-d H:i:s") %}
+
+        {% if inscrit %}
+            {% if sortie.dateHeureDebut > "now"|date("Y-m-d H:i:s") %}
+        <form action="{{ path('sortie_desinscription', { id: sortie.id }) }}" method="POST" style="display:inline;">
+            <button type="submit" class="btn btn-warning">Se désinscrire</button>
+        </form>
+            {% endif %}
+        {% else %}
+        <form action="{{ path('sortie_inscription', { id: sortie.id }) }}" method="POST">
+            <button type="submit" class="btn btn-success">S'inscrire</button>
+        </form>
+
+         {% endif %}
+
+    {% else %}
+        <button class="btn btn-secondary" disabled>Inscriptions fermées</button>
+    {% endif %}
+
+    {% if estCloturee %}
+        <button class="alert alert-danger" disabled="">Cette sortie est clôturée.</button>
+    {% endif %}
+
+
+    <a href="{{ path('app_sortie') }}" class="btn btn-link mt-3">Retour à la liste</a>
+
+
+    <h3>Utilisateurs inscrits</h3>
+
+    {% if sortie.users|length > 0 %}
+        <ul>
+            {% for user in sortie.users %}
+                <li>
+                    <a href="{{ path('user_profile_public', { id: user.id }) }}">
+                        {{ user.username }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucun utilisateur inscrit pour l'instant.</p>
+    {% endif %}
+
+{% endblock %}
