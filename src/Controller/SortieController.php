@@ -66,28 +66,22 @@ final class SortieController extends AbstractController
     #[Route('/sortie-list', name: 'app_sortie', methods: ['GET', 'POST'])]
     public function list(Request $request, SortieRepository $sortieRepository): Response
     {
-
         $formFiltre = $this->createForm(FiltreSiteType::class);
         $formFiltre->handleRequest($request);
 
+        $site = null;
         if ($formFiltre->isSubmitted() && $formFiltre->isValid()) {
-            $site = $formFiltre->get('site')->getData(); // récupère l'objet Site sélectionné
-            $sorties = $sortieRepository->findBySite($site ? $site->getId() : null);
-        } else {
-            $sorties = $sortieRepository->findAll();
+            $site = $formFiltre->get('site')->getData();
         }
 
+        $sorties = $sortieRepository->findBySite($site ? $site->getId() : null);
 
         return $this->render('sorties/list.html.twig', [
-
-        $sorties = $repository->findAll();
-
-        return $this->render('sorties/list.html.twig', [
-
             'sorties' => $sorties,
-            'formFiltre' => $formFiltre->createView(), // <-- ici
+            'formFiltre' => $formFiltre->createView(),
         ]);
     }
+
 
     #[Route('/sortie/{id}', name: 'sortie_show', methods: ['GET'])]
     public function show(int $id, EntityManagerInterface $em): Response
@@ -195,6 +189,16 @@ final class SortieController extends AbstractController
 
         $this->addFlash('success', 'Vous êtes désinscrit de la sortie.');
         return $this->redirectToRoute('sortie_show', ['id' => $id]);
+
+    }
+
+    #[Route('/historique-sortie', name: 'historique_sortie', methods: ['GET'])]
+    public function historique (SortieRepository $sortieRepository): Response
+    {
+        $sorties = $sortieRepository->findSortiesArchivees();
+
+        return $this->render('sorties/historique.html.twig', [ 'sorties' => $sorties
+        ]);
 
     }
 
