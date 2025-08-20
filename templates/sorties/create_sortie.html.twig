@@ -55,28 +55,25 @@
                     {{ form_widget(sortieForm.etat, {'attr': {'class': 'uk-select uk-border-pill'}}) }}
                 </div>
 
-                <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
-                    <div>
-                        {{ form_label(sortieForm.siteOrganisateur, 'Site organisateur', {'label_attr': {'class': 'uk-form-label'}}) }}
-                        <div class="uk-form-controls">
-                            {{ form_widget(sortieForm.siteOrganisateur, {'attr': {'class': 'uk-select uk-border-pill'}}) }}
-                        </div>
-                    <div>
-                        {{ form_label(sortieForm.lieu, 'Lieu', {'label_attr': {'class': 'uk-form-label'}}) }}
-                        <div class="uk-flex">
-                            {{ form_widget(sortieForm.lieu, {'attr': {'class': 'uk-select uk-border-pill'}}) }}
-                            <button type="button" class="uk-button uk-button-secondary uk-border-pill uk-margin-small-left" uk-toggle="target: #modal-lieu">
-                                + Nouveau
-                            </button>
-                        </div>
+                <div class="uk-margin">
+                    {{ form_label(sortieForm.siteOrganisateur, 'Site organisateur', {'label_attr': {'class': 'uk-form-label'}}) }}
+                    {{ form_widget(sortieForm.siteOrganisateur, {'attr': {'class': 'uk-select uk-border-pill'}}) }}
+                </div>
+
+                <div class="uk-margin">
+                    {{ form_label(sortieForm.lieu, 'Lieu', {'label_attr': {'class': 'uk-form-label'}}) }}
+                    <div class="uk-flex">
+                        {{ form_widget(sortieForm.lieu, {'attr': {'class': 'uk-select uk-border-pill'}}) }}
+                        <button type="button" class="uk-button uk-button-secondary uk-border-pill uk-margin-small-left" uk-toggle="target: #modal-lieu">
+                            + Nouveau
+                        </button>
                     </div>
                 </div>
 
-                <!-- Détails du lieu -->
                 <div id="lieu-details"
                      class="uk-alert-primary uk-padding-small uk-border-rounded uk-margin"
                      style="display:none"
-                     data-url-template="{{ path('lieu_details', {id: 0})|replace({'0':'__ID__'}) }}">
+                     data-url-template="{{ path('lieu_details', {'id': 0})|replace({'0':'__ID__'}) }}">
                 </div>
 
                 <div class="uk-margin">
@@ -84,9 +81,9 @@
                         Enregistrer la sortie
                     </button>
                 </div>
+
             </fieldset>
             {{ form_end(sortieForm) }}
-
         </div>
     </div>
 
@@ -103,15 +100,23 @@
                 <button type="submit" class="uk-button uk-button-primary uk-border-pill">Enregistrer</button>
             </div>
             {{ form_end(lieuForm) }}
+
+            <div id="map" data-controller="map" style="height: 500px; margin-top: 1rem;"></div>
         </div>
     </div>
 
-    <!-- JS UIkit -->
+    <!-- CSS y JS externos -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit-icons.min.js"></script>
 
+    <!-- Mapa controlador -->
+    <script type="module" src="{{ asset('controllers/map_controller.js') }}"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // ---- Detalles del lugar ----
             const selectLieu = document.querySelector('select[name$="[lieu]"]');
             const detailsBox = document.getElementById('lieu-details');
             const urlTemplate = detailsBox ? detailsBox.dataset.urlTemplate : '';
@@ -147,6 +152,40 @@
             if (selectLieu) {
                 if (selectLieu.value) loadDetails(selectLieu.value);
                 selectLieu.addEventListener('change', () => loadDetails(selectLieu.value));
+            }
+
+            // ---- Mapa en modal ----
+            const modalLieu = document.getElementById('modal-lieu');
+            const mapDiv = modalLieu.querySelector('#map');
+            let map = null;
+
+            UIkit.util.on(modalLieu, 'shown', () => {
+                if (!map) {
+                    map = L.map(mapDiv).setView([48.8566, 2.3522], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap contributors'
+                    }).addTo(map);
+                } else {
+                    map.invalidateSize();
+                }
+            });
+
+            const latitudeInput = modalLieu.querySelector('input[name$="[latitude]"]');
+            const longitudeInput = modalLieu.querySelector('input[name$="[longitude]"]');
+
+            function updateMapMarker() {
+                const lat = parseFloat(latitudeInput.value);
+                const lng = parseFloat(longitudeInput.value);
+                if (!isNaN(lat) && !isNaN(lng) && map) {
+                    if (map.marker) map.removeLayer(map.marker);
+                    map.marker = L.marker([lat, lng]).addTo(map);
+                    map.setView([lat, lng], 15);
+                }
+            }
+
+            if (latitudeInput && longitudeInput) {
+                latitudeInput.addEventListener('input', updateMapMarker);
+                longitudeInput.addEventListener('input', updateMapMarker);
             }
         });
     </script>
