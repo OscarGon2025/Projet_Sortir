@@ -1,70 +1,65 @@
 {% extends 'base.html.twig' %}
 
-
-{#{% block title %}list sortie{% endblock %}#}
-
-{#{% block body %}#}
-
-{#    <h1>Liste des sorties</h1>#}
-{#    <ul>#}
-{#        {% for sortie in sorties %}#}
-{#            <li>#}
-{#                {{ sortie.nom }}#}
-{#                ({{ sortie.dateHeureDebut|date('d/m/Y H:i') }})#}
-{#                {{ sortie.etat.libelle }}#}
-{#                {{ sortie.siteOrganisateur.nom }}#}
-{#                {{ sortie.Lieu.nom }}#}
-{#                ({{ sortie.dateLimiteInscription|date('d/m/Y H:i') }})#}
-{#                ({{ sortie.nbInscriptionsMax }})#}
-{#                ({{ sortie.duree }})#}
-{#                ({{ sortie.organisateur.nom }})#}
-{#            </li>#}
-{#        {% endfor %}#}
-{#    </ul>#}
-
-{#{% endblock %}#}
-
-{% extends 'base.html.twig' %}
-
 {% block title %}Liste des sorties{% endblock %}
 
 {% block body %}
-    <h1>Liste des sorties</h1>
+    <h1 class="uk-heading-line uk-text-center"><span>Liste des sorties</span></h1>
 
-<br>
-    {{ form_start(formFiltre) }}
-    {{ form_row(formFiltre.site) }}
-    <button type="submit">Filtrer</button>
-    {{ form_end(formFiltre) }}
-</br>
-
-    {% for sortie in sorties %}
-        <div class="sortie-item">
-            <h3>{{ sortie.nom }}</h3>
-            <p><strong>État :</strong> {{ sortie.etat.libelle }}</p>
-            <p><strong>Lieu de la sortie :</strong> {{ sortie.Lieu.nom }}</p>
-            <p><strong>Organisateur :</strong> {{ sortie.organisateur.username }}</p>
-            <p><strong>Date limite inscription :</strong>
-                {{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y H:i') : 'Non définie' }}
-            </p>
-            <p><strong>Participants inscrits :</strong> {% if sortie.users|length > 0 %}
-            <ul>
-                {% for user in sortie.users %}
-                    <li>{{ user.username }}</li>
-                {% endfor %}
-            </ul>
-            {% else %}
-                <p>Aucun utilisateur inscrit pour l'instant.</p>
-            {% endif %} </p>
-            <a href="{{ path('sortie_show', { id: sortie.id }) }}" class="btn btn-primary">Voir détails / S'inscrire</a>
+    <div class="uk-card uk-card-default uk-card-small uk-card-body uk-margin-bottom">
+        {{ form_start(formFiltre, {'attr': {'class': 'uk-form-stacked'}}) }}
+        <div class="uk-grid-small" uk-grid>
+            <div class="uk-width-1-2@s uk-width-1-3@m">
+                {{ form_row(formFiltre.site) }}
+            </div>
+            <div class="uk-width-auto">
+                <button type="submit" class="uk-button uk-button-primary uk-border-pill">Filtrer</button>
+            </div>
         </div>
-        <hr>
-    {% else %}
-        <p>Aucune sortie disponible.</p>
-    {% endfor %}
+        {{ form_end(formFiltre) }}
+    </div>
 
+    <div class="uk-grid-small uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l" uk-grid>
+        {% for sortie in sorties %}
+            <div>
+                <div class="uk-card uk-card-default uk-card-small uk-card-hover uk-card-body">
+                    <h3 class="uk-margin-remove-bottom">{{ sortie.nom }}</h3>
+                    <hr class="uk-margin-small-top uk-margin-small-bottom">
 
-   
+                    <p><strong>État :</strong> {{ sortie.etat.libelle }}</p>
+                    <p><strong>Lieu :</strong> {{ sortie.Lieu.nom }}</p>
+                    <p><strong>Organisateur :</strong> {{ sortie.organisateur.username }}</p>
+                    <p><strong>Date limite :</strong>
+                        {{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y H:i') : 'Non définie' }}
+                    </p>
 
+                    <p><strong>Participants :</strong></p>
+                    {% if sortie.users|length > 0 %}
+                        <ul class="uk-list uk-list-collapse uk-text-small">
+                            {% for user in sortie.users %}
+                                <li>{{ user.username }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="uk-text-meta">Aucun utilisateur inscrit</p>
+                    {% endif %}
 
+                    <a href="{{ path('sortie_show', { id: sortie.id }) }}" class="uk-button uk-button-secondary uk-button-small uk-margin-top">
+                        Voir détails / S'inscrire
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <p class="uk-text-center uk-text-meta">Aucune sortie disponible.</p>
+        {% endfor %}
+    </div>
+
+    <div class="uk-margin-top">
+
+    <div class="uk-margin-bottom">
+        <a href="{{ path('historique_sortie') }}" class="uk-button uk-button-primary uk-border-rounded">
+            Voir l'historique des sorties
+        </a>
+    </div>
+
+        <div class="uk-margin-bottom">
 {% endblock %}
