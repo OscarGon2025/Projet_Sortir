@@ -65,6 +65,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 //    #[ORM\JoinColumn(nullable: false)]
     private ?Site $estRattacheA = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $photoFilename = null;
+
     public function __construct()
     {
         $this->sorties = new ArrayCollection();
@@ -261,4 +264,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // TODO: Implement getUserIdentifier() method.
         return $this->username;
     }
+
+    public function getPhotoFilename(): ?string
+    {
+        return $this->photoFilename;
+    }
+
+    public function setPhotoFilename(?string $photoFilename): static
+    {
+        $this->photoFilename = $photoFilename;
+        return $this;
+    }
+
+
 }

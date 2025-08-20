@@ -13,5 +13,14 @@
     <p>Mail : {{ user.mail }}</p>
 {#    <p>Mot de passe : {{ user.password }}</p>#}
     <a href="{{ path('app_change_password') }}" class="btn btn-primary">Changer mon mot de passe</a>
+    <a href="{{ path('app_profile_edit') }}" class="btn btn-primary">Editer mon profil</a>
+
+
+    {% if user.photoFilename %}
+        <img src="{{ asset('uploads/photos/' ~ user.photoFilename) }}" alt="Photo de profil" width="150" height="150">
+    {% else %}
+        <img src="{{ asset('images/avatardefault.jpg') }}" alt="Photo de profil par défaut" width="150" height="150">
+    {% endif %}
+
 
 {% endblock %}

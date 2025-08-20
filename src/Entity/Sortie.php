@@ -52,6 +52,9 @@ class Sortie
     #[ORM\Column(type: Types::TEXT)]
     private ?string $infoSortie = null;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $motifAnnulation = null;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Etat $etat = null;
@@ -216,4 +219,16 @@ class Sortie
 
         return $this;
     }
+
+    public function getMotifAnnulation(): ?string
+    {
+        return $this->motifAnnulation;
+    }
+
+    public function setMotifAnnulation(?string $motif): self
+    {
+        $this->motifAnnulation = $motif;
+        return $this;
+    }
+
 }

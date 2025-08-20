@@ -30,6 +30,10 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
         $etat2->setLibelle('Ouverte');
         $manager->persist($etat2);
 
+        $etat3 = new Etat();
+        $etat3->setLibelle('Annulée');
+        $manager->persist($etat3);
+
         $site = new Site();
         $site->setNom('Rennes');
         $site = $this->getReference('site-rennes', Site::class);
