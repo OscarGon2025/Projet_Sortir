@@ -38,6 +38,4 @@ class ImportUserCommand extends Command {
         }
     }
 
-
-
 }

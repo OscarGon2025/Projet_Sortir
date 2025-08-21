@@ -16,10 +16,7 @@ class UserImportService
     {
         $this->passwordHasher = $passwordHasher;
         $this->em = $em;
-
     }
-
-
 
     public function importUsers(string $filePath): int
     {
@@ -79,6 +76,7 @@ class UserImportService
 
 
             $this->em->persist($user);
+
             $count++;
         }
 
