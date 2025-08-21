@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Etat;
 use App\Entity\Lieu;
 use App\Entity\Sortie;
 use App\Form\AnnulationType;
@@ -20,7 +21,7 @@ use App\Repository\SortieRepository;
 final class SortieController extends AbstractController
 {
     #[Route('/sortie-create', name: 'sortie_create', methods: ['GET', 'POST'])]
-    public function create(Request $request, EntityManagerInterface $em, EtatRepository $etatRepository): Response
+    public function create(Request $request, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
         if (!$user) {
@@ -32,9 +33,12 @@ final class SortieController extends AbstractController
         $sortie->setOrganisateur($user);
         $sortie->setDateCreated(new \DateTimeImmutable());
 
-        // Asignar el estado por defecto (Ej: "Créée")
-        $etatObjet = $etatRepository->find(1); // ID del estado que quieras
-        $sortie->setEtat($etatObjet);
+        // Asignar estado automáticamente (ejemplo: "Créée")
+        $etat = new Etat();
+        $etat->setLibelle("Créée"); // 👈 aquí defines el estado inicial
+        $em->persist($etat);
+
+        $sortie->setEtat($etat);
 
         // Formulario de la salida
         $form = $this->createForm(SortieType::class, $sortie);

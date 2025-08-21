@@ -67,6 +67,10 @@ class Sortie
     #[ORM\JoinColumn(nullable: false)]
     private ?Lieu $lieu = null;
 
+
+    // ATENCION LINEA COMENTADA POR OSCAR !!!!
+
+
     public function getLieu(): ?Lieu
     {
         return $this->lieu;
@@ -219,19 +223,19 @@ class Sortie
         return $this;
     }
 
-}
+
 //ATTENTION !!!!!!!!!!!------>>>>>>
-    public function getLieu(): ?Lieu
-    {
-        return $this->Lieu;
-    }
-
-    public function setLieu(?Lieu $Lieu): static
-    {
-        $this->Lieu = $Lieu;
-
-        return $this;
-    }
+//    public function getLieu(): ?Lieu
+//    {
+//        return $this->Lieu;
+//    }
+//
+//    public function setLieu(?Lieu $Lieu): static
+//    {
+//        $this->Lieu = $Lieu;
+//
+//        return $this;
+//    }
 
     public function getMotifAnnulation(): ?string
     {

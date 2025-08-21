@@ -4,7 +4,6 @@ namespace App\DataFixtures;
 
 use App\Entity\Etat;
 use App\Entity\Lieu;
-use App\Entity\Site;
 use App\Entity\Sortie;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -22,6 +21,7 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
 
     public function load(ObjectManager $manager): void
     {
+        // États
         $etat1 = new Etat();
         $etat1->setLibelle('Créée');
         $manager->persist($etat1);
@@ -34,11 +34,11 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
         $etat3->setLibelle('Annulée');
         $manager->persist($etat3);
 
-        $site = new Site();
-        $site->setNom('Rennes');
-        $site = $this->getReference('site-rennes', Site::class);
-        $manager->persist($site);
+        // Récupération du site depuis SiteFixtures
+        /** @var \App\Entity\Site $site */
+        $site = $this->getReference('site-rennes', \App\Entity\Site::class);
 
+        // Création d'un lieu (pas encore en fixtures séparées)
         $lieu = new Lieu();
         $lieu->setVille('Paris');
         $lieu->setCodePostal('A3234');
@@ -48,6 +48,7 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
         $lieu->setLongitude(2.3522);
         $manager->persist($lieu);
 
+        // Création de la sortie
         $sortie = new Sortie();
         $sortie->setNom('Sortie test');
         $sortie->setDateCreated(new \DateTimeImmutable('now'));
@@ -60,17 +61,11 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
         $sortie->setSiteOrganisateur($site);
         $sortie->setLieu($lieu);
 
-        $sortie->setSiteOrganisateur($site);
-
+        // Organisateur depuis UserFixtures
         $organisateur = $this->getReference('user1', \App\Entity\User::class);
         $sortie->setOrganisateur($organisateur);
-
-
 
         $manager->persist($sortie);
         $manager->flush();
     }
-
-
 }
-

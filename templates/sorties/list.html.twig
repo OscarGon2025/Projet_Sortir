@@ -1,78 +1,69 @@
-
-{#{% block title %}list sortie{% endblock %}#}
-
-{#{% block body %}#}
-
 {% extends 'base.html.twig' %}
 
 {% block title %}Liste des sorties{% endblock %}
 
 {% block body %}
-    <main>
-        <div class="uk-container uk-padding-large">
+    <div class="uk-padding-large uk-section-secondary">
 
+        <!-- Titre -->
+        <h1 class="uk-heading-line uk-text-center"><span>Liste des sorties</span></h1>
 
-            <!-- Titre -->
-            <h1 class="uk-heading-line uk-text-center"><span>Liste des sorties</span></h1>
+        <!-- Filtre -->
+        <div class="uk-card uk-card-secondary uk-card-small uk-card-body uk-margin-bottom uk-background-secondary uk-light">
+            {{ form_start(formFiltre, {'attr': {'class': 'uk-form-stacked'}}) }}
+            <div class="uk-grid-small uk-flex-middle" uk-grid>
+                <div class="uk-width-auto">
+                    {{ form_row(formFiltre.site, {'label': false, 'attr': {'class': 'uk-select uk-border-pill uk-background-secondary uk-light'}}) }}
+                </div>
+                <div class="uk-width-auto">
+                    <button type="submit" class="uk-button uk-button-primary uk-border-pill">Filtrer</button>
+                </div>
+            </div>
+            {{ form_end(formFiltre) }}
+        </div>
 
-            <!-- Filtre -->
-            <div class="uk-card uk-card-default uk-card-small uk-card-body uk-margin-bottom uk-background-secondary uk-light">
-                {{ form_start(formFiltre, {'attr': {'class': 'uk-form-stacked'}}) }}
-                <div class="uk-grid-small uk-flex-middle" uk-grid>
-                    <div class="uk-width-auto">
-                        {{ form_row(formFiltre.site, {'label': false, 'attr': {'class': 'uk-select uk-border-pill uk-background-secondary uk-light'}}) }}
-                    </div>
-                    <div class="uk-width-auto">
-                        <button type="submit" class="uk-button uk-button-primary uk-border-pill">Filtrer</button>
+        <!-- Liste des sorties -->
+        <div class="uk-grid-small uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l" uk-grid>
+            {% for sortie in sorties %}
+                <div>
+                    <div class="uk-card uk-card-secondary uk-card-body uk-border-rounded uk-box-shadow-hover-medium">
+                        <h3 class="uk-margin-remove-bottom uk-text-primary">{{ sortie.nom }}</h3>
+                        <hr class="uk-margin-small-top uk-margin-small-bottom">
+
+                        <p><strong>État :</strong> {{ sortie.etat.libelle }}</p>
+                        <p><strong>Lieu :</strong> {{ sortie.Lieu.nom }}</p>
+                        <p><strong>Organisateur :</strong> {{ sortie.organisateur.username }}</p>
+                        <p><strong>Date limite :</strong>
+                            {{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y H:i') : 'Non définie' }}
+                        </p>
+
+                        <p><strong>Participants :</strong></p>
+                        {% if sortie.users|length > 0 %}
+                            <ul class="uk-list uk-list-collapse uk-text-small">
+                                {% for user in sortie.users %}
+                                    <li>{{ user.username }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="uk-text-meta">Aucun utilisateur inscrit</p>
+                        {% endif %}
+
+                        <a href="{{ path('sortie_show', { id: sortie.id }) }}" class="uk-button uk-button-secondary uk-border-pill uk-margin-top">
+                            Voir détails / S'inscrire
+                        </a>
                     </div>
                 </div>
-                {{ form_end(formFiltre) }}
-            </div>
-
-            <!-- Liste des sorties -->
-            <div class="uk-grid-small uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l" uk-grid>
-                {% for sortie in sorties %}
-                    <div>
-                        <div class="uk-card uk-card-body uk-border-rounded uk-box-shadow-hover-medium">
-                            <h3 class="uk-margin-remove-bottom uk-text-primary">{{ sortie.nom }}</h3>
-                            <hr class="uk-margin-small-top uk-margin-small-bottom">
-
-                    <p><strong>État :</strong> {{ sortie.etat.libelle }}</p>
-                    <p><strong>Lieu :</strong> {{ sortie.Lieu.nom }}</p>
-                    <p><strong>Organisateur :</strong> {{ sortie.organisateur ? sortie.organisateur.username : 'Organisateur supprimé' }}
-                    </p>
-                    <p><strong>Date limite :</strong>
-                        {{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y H:i') : 'Non définie' }}
-                    </p>
-
-
-                            <p><strong>Participants :</strong></p>
-                            {% if sortie.users|length > 0 %}
-                                <ul class="uk-list uk-list-collapse uk-text-small">
-                                    {% for user in sortie.users %}
-                                        <li>{{ user.username }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <p class="uk-text-meta">Aucun utilisateur inscrit</p>
-                            {% endif %}
-
-                            <a href="{{ path('sortie_show', { id: sortie.id }) }}" class="uk-button uk-button-secondary uk-border-pill uk-margin-top">
-                                Voir détails / S'inscrire
-                            </a>
-                        </div>
-                    </div>
-                {% else %}
-                    <p class="uk-text-center uk-text-meta">Aucune sortie disponible.</p>
-                {% endfor %}
-            </div>
-
-            <!-- Bouton Historique -->
-            <div class="uk-margin-top uk-text-center">
-                <a href="{{ path('historique_sortie') }}" class="uk-button uk-button-primary uk-border-pill uk-width-medium">
-                    Voir l'historique des sorties
-                </a>
-            </div>
+            {% else %}
+                <p class="uk-text-center uk-text-meta">Aucune sortie disponible.</p>
+            {% endfor %}
         </div>
-    </main>
+
+        <!-- Bouton Historique -->
+        <div class="uk-margin-top uk-text-center">
+            <a href="{{ path('historique_sortie') }}" class="uk-button uk-button-primary uk-border-pill uk-width-medium">
+                Voir l'historique des sorties
+            </a>
+        </div>
+    </div>
 {% endblock %}
+ 
