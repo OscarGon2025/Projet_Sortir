@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des utilisateurs{% endblock %}
+
+{% block body %}
+    <form method="post" id="users-form">
+        <table>
+            <thead>
+            <tr>
+                <th></th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Actif</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <td><input type="checkbox" name="user_ids[]" value="{{ user.id }}"></td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.mail }}</td>
+                    <td>{{ user.actif ? 'Oui' : 'Non' }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" formaction="{{ path('admin_users_desactiver') }}">Désactiver sélectionnés</button>
+        <button type="submit" formaction="{{ path('admin_users_reactivate') }}">Réactiver sélectionnés</button>
+        <button type="submit" formaction="{{ path('admin_users_delete') }}"
+                onclick="return confirm('Voulez-vous vraiment supprimer ces utilisateurs ?')">
+            Supprimer sélectionnés
+        </button>
+    </form>
+{% endblock %}

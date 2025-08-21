@@ -4,18 +4,26 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\ChangePasswordFormType;
+use App\Form\ResetPasswordFormType;
+use App\Form\ResetPasswordRequestFormType;
 use App\Form\UserModifFormType;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 //use http\Env\Request;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Messenger\SendEmailMessage;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+
 
 final class SecurityController extends AbstractController
 {
@@ -49,11 +57,11 @@ final class SecurityController extends AbstractController
         $user = $this->getUser();
 
         //Renvoie vers la page /login si utilisateur pas connecté
-        if (!$user){
+        if (!$user) {
             return $this->redirectToRoute('app_login');
         }
 
-        return $this->render('profile/profile.html.twig',[
+        return $this->render('profile/profile.html.twig', [
             'user' => $user,
         ]);
     }
@@ -63,7 +71,7 @@ final class SecurityController extends AbstractController
     {
         $user = $this->getUser();
 
-        if(!$user){
+        if (!$user) {
             return $this->redirectToRoute('app_login');
         }
 
@@ -111,12 +119,11 @@ final class SecurityController extends AbstractController
                 }
 
                 //Déplacement du fichier photo dans le dossier prévu
-                    try {
-                        $photoFile->move(
-                            $this->getParameter('photos_directory'),
-                            $newFilename);
-                    }
-                    catch (FileException $e) {
+                try {
+                    $photoFile->move(
+                        $this->getParameter('photos_directory'),
+                        $newFilename);
+                } catch (FileException $e) {
                     $this->addFlash('error', "Erreur lors de l'upload de la photo : " . $e->getMessage());
                     return $this->redirectToRoute('app_profile_edit');
                 }
@@ -144,7 +151,7 @@ final class SecurityController extends AbstractController
     {
         $user = $this->getUser();
 
-        if(!$user){
+        if (!$user) {
             return $this->redirectToRoute('app_login');
         }
         $form = $this->createForm(ChangePasswordFormType::class, $user);
@@ -160,7 +167,7 @@ final class SecurityController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-            $this->addFlash('success' , 'Mot de passe modifié avec succès !');
+            $this->addFlash('success', 'Mot de passe modifié avec succès !');
 
             return $this->redirectToRoute('app_profile');
         }
@@ -183,5 +190,108 @@ final class SecurityController extends AbstractController
             'user' => $user,
         ]);
     }
+
+    #[Route('/mot-de-passe-oublie', name: 'app_forgot_password')]
+    public function forgotPassword(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, UserRepository $userRepository, MailerInterface $mailer): Response
+    {
+
+        $form = $this->createForm(ResetPasswordRequestFormType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user = $userRepository->findOneBy(['mail' => $form->get('mail')->getData()]);
+
+            if ($user) {
+                //Pour générer un token unique
+                $token = bin2hex(random_bytes(32));
+                //Mettre le token et sa date d'expiration en BDD
+                $expiresAt = new \DateTimeImmutable('+1 hour');
+                $user->setResetToken($token);
+//                $user->setResetTokenExpiresAt(new \DateTime('+1 hour'));
+                $user->setResetTokenExpiresAt($expiresAt);
+                $em->flush();
+
+                //Pour générer l'URL
+                $url = $this->generateUrl('reset_password', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
+
+                //Pour envoyer l'email
+                $email = (new Email())
+                    ->from('no-reply@openblog.test')
+                    ->to($user->getMail())
+                    ->subject('Récupération de mot de passe sur OpenBlog')
+                    ->html($this->renderView('emails/password_reset.html.twig', [
+                        'user' => $user,
+                        'url'  => $url,
+                        'expiresAt' => $expiresAt,
+                        'validityMinutes' => 60,
+                    ]));
+                $mailer->send($email);
+
+//                $this->addFlash('success', 'Email envoyé avec succès.');
+//                return $this->redirectToRoute('app_login');
+                $this->addFlash('success', 'Email envoyé avec succès.');
+
+// TEMPORAIRE : on reste sur la page pour voir la toolbar et le mail dans le profiler
+                return $this->render('security/reset_password_request.html.twig', [
+                    'requestPassForm' => $form->createView(),
+                ]);
+
+            }
+
+            $this->addFlash('danger', 'Un problème est survenu.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        return $this->render('security/reset_password_request.html.twig', [
+            'requestPassForm' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/mot-de-passe-oublie/{token}', name: 'reset_password')]
+    public function resetPassword(string $token, UserRepository $userRepository, Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em): Response
+    {
+        $user = $userRepository->findOneBy(['resetToken' => $token]);
+
+        if (!$user || $user->getResetTokenExpiresAt() < new \DateTimeImmutable()) {
+            $this->addFlash('danger', 'Le lien est invalide ou a expiré.');
+            return $this->redirectToRoute('app_forgot_password');
+        }
+
+        $form = $this->createForm(ResetPasswordFormType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()){
+            $user->setPassword($passwordHasher->hashPassword($user, $form->get('password')->getData()));
+
+            //Pour invalider le token afin qu'il ne soit plus réutilisable.
+            $user->setResetToken(null);
+            $user->setResetTokenExpiresAt(null);
+
+            $em->flush();
+
+            $this->addFlash('success', 'Mot de passe changé avec succès.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        return $this->render('security/reset_password.html.twig', [
+            'passForm' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/test-mail', name: 'app_test_mail')]
+    public function testMail(MailerInterface $mailer): Response
+    {
+        $email = (new Email())
+            ->from('test@example.com')
+            ->to('fake@example.com')
+            ->subject('Email de test')
+            ->text('Ceci est un test')
+            ->html('<p>Ceci est un <b>test</b></p>');
+
+        $mailer->send($email);
+
+        return new Response('Mail envoyé (simulé)');
+    }
+
 
 }

@@ -63,6 +63,11 @@
                 </a>
             </li>
 
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_admin') }}">Administration</a>
+            {% endif %}
+
+
             {% if app.user is empty %}
                 <li class="uk-nav-divider"></li>
                 <li class="uk-margin-small-top">
