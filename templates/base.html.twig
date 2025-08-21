@@ -61,12 +61,11 @@
                     <span class="uk-margin-small-right" uk-icon="thumbnails"></span>
                     Voir mes sorties
                 </a>
+                <a href="{{ path('app_admin') }}">
+                <span class="uk-margin-small-right" uk-icon="thumbnails"></span>
+                Administration
+                </a>
             </li>
-
-            {% if is_granted('ROLE_ADMIN') %}
-                <a href="{{ path('app_admin') }}">Administration</a>
-            {% endif %}
-
 
             {% if app.user is empty %}
                 <li class="uk-nav-divider"></li>

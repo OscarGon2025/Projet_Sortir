@@ -35,7 +35,7 @@ final class SortieController extends AbstractController
 
         // Asignar estado automáticamente (ejemplo: "Créée")
         $etat = new Etat();
-        $etat->setLibelle("Créée"); // 👈 aquí defines el estado inicial
+        $etat->setLibelle("Ouverte"); // 👈 aquí defines el estado inicial
         $em->persist($etat);
 
         $sortie->setEtat($etat);
