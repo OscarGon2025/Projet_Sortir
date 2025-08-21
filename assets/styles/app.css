@@ -157,3 +157,8 @@ body.create {
     height: 50vh;        /* o 100% del contenedor */
     width: 100%;
 }
+
+#modal-map {
+    width: 100%;
+    height: 400px;
+}

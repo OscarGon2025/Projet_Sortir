@@ -22,29 +22,29 @@ class LieuType extends AbstractType
             ->add('rue', TextType::class, [
                 'label' => 'Rue',
                 'required' => true,
-                'attr' => ['placeholder' => 'Entrez la rue'],
+                'attr' => ['placeholder' => 'Adresse'],
             ])
             ->add('ville', TextType::class, [
                 'label' => 'Ville',
                 'required' => true,
                 'attr' => ['placeholder' => 'Entrez la ville'],
             ])
-            ->add('codePostal', TextType::class, [
+            ->add('codepostal', TextType::class, [
                 'label' => 'Code Postal',
                 'required' => true,
                 'attr' => ['placeholder' => 'Ex: 75000'],
             ])
-            ->add('latitude', NumberType::class, [
+            ->add('latitude', NumberType::class,  [
                 'label' => 'Latitude',
                 'required' => true,
                 'scale' => 6,
-                'attr' => ['placeholder' => 'Ex: 48.8566'],
+                'attr' => ['readonly' => true],
             ])
             ->add('longitude', NumberType::class, [
                 'label' => 'Longitude',
                 'required' => true,
                 'scale' => 6,
-                'attr' => ['placeholder' => 'Ex: 2.3522'],
+                'attr' => ['readonly' => true],
             ]);
     }
 

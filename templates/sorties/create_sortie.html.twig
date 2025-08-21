@@ -3,190 +3,228 @@
 {% block title %}{{ parent() }} | Créer une sortie{% endblock %}
 
 {% block body %}
-    <div class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-height-viewport uk-overflow-hidden uk-light" data-uk-height-viewport>
-
-        <!-- overlay sombre -->
+    <div class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-height-viewport uk-overflow-hidden uk-light">
         <div class="uk-position-cover uk-overlay-primary"></div>
-
         <div class="uk-width-xlarge uk-padding-small uk-position-z-index" uk-scrollspy="cls: uk-animation-fade">
-
             <div class="uk-text-center uk-margin">
                 <h1 class="uk-heading-line uk-text-bold"><span>Créer une Sortie</span></h1>
             </div>
 
-            <!-- Formulaire de sortie -->
             {{ form_start(sortieForm, {'attr': {'class': 'uk-form-stacked'}}) }}
             <fieldset class="uk-fieldset">
-
-                <div class="uk-margin">
-                    {{ form_label(sortieForm.nom, 'Nom', {'label_attr': {'class': 'uk-form-label'}}) }}
-                    {{ form_widget(sortieForm.nom, {'attr': {'class': 'uk-input uk-border-pill'}}) }}
-                </div>
-
-                <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
-                    <div>
-                        {{ form_label(sortieForm.dateHeureDebut, 'Date début', {'label_attr': {'class': 'uk-form-label'}}) }}
-                        {{ form_widget(sortieForm.dateHeureDebut, {'attr': {'class': 'uk-input uk-border-pill'}}) }}
+                {% for field in ['nom','dateHeureDebut','duree','dateLimiteInscription','nbInscriptionsMax','infoSortie','etat','siteOrganisateur'] %}
+                    {% set widgetClass = field == 'infoSortie' ? 'uk-textarea uk-border-rounded' : (field matches '/^(etat|siteOrganisateur)$/' ? 'uk-select uk-border-pill' : 'uk-input uk-border-pill') %}
+                    <div class="uk-margin">
+                        {{ form_row(attribute(sortieForm, field), {'attr': {'class': widgetClass}}) }}
                     </div>
-                    <div>
-                        {{ form_label(sortieForm.duree, 'Durée (min)', {'label_attr': {'class': 'uk-form-label'}}) }}
-                        {{ form_widget(sortieForm.duree, {'attr': {'class': 'uk-input uk-border-pill'}}) }}
-                    </div>
-                </div>
-
-                <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
-                    <div>
-                        {{ form_label(sortieForm.dateLimiteInscription, 'Date limite inscription', {'label_attr': {'class': 'uk-form-label'}}) }}
-                        {{ form_widget(sortieForm.dateLimiteInscription, {'attr': {'class': 'uk-input uk-border-pill'}}) }}
-                    </div>
-                    <div>
-                        {{ form_label(sortieForm.nbInscriptionsMax, 'Nb max participants', {'label_attr': {'class': 'uk-form-label'}}) }}
-                        {{ form_widget(sortieForm.nbInscriptionsMax, {'attr': {'class': 'uk-input uk-border-pill'}}) }}
-                    </div>
-                </div>
-
-                <div class="uk-margin">
-                    {{ form_label(sortieForm.infoSortie, 'Info sortie', {'label_attr': {'class': 'uk-form-label'}}) }}
-                    {{ form_widget(sortieForm.infoSortie, {'attr': {'class': 'uk-textarea uk-border-rounded'}}) }}
-                </div>
-
-                <div class="uk-margin">
-                    {{ form_label(sortieForm.etat, 'État', {'label_attr': {'class': 'uk-form-label'}}) }}
-                    {{ form_widget(sortieForm.etat, {'attr': {'class': 'uk-select uk-border-pill'}}) }}
-                </div>
-
-                <div class="uk-margin">
-                    {{ form_label(sortieForm.siteOrganisateur, 'Site organisateur', {'label_attr': {'class': 'uk-form-label'}}) }}
-                    {{ form_widget(sortieForm.siteOrganisateur, {'attr': {'class': 'uk-select uk-border-pill'}}) }}
-                </div>
+                {% endfor %}
 
                 <div class="uk-margin">
                     {{ form_label(sortieForm.lieu, 'Lieu', {'label_attr': {'class': 'uk-form-label'}}) }}
                     <div class="uk-flex">
-                        {{ form_widget(sortieForm.lieu, {'attr': {'class': 'uk-select uk-border-pill'}}) }}
+                        {{ form_widget(sortieForm.lieu, {'attr': {'class': 'uk-select uk-border-pill', 'id': 'sortie-lieu-select'}}) }}
                         <button type="button" class="uk-button uk-button-secondary uk-border-pill uk-margin-small-left" uk-toggle="target: #modal-lieu">
                             + Nouveau
                         </button>
                     </div>
                 </div>
 
-                <div id="lieu-details"
-                     class="uk-alert-primary uk-padding-small uk-border-rounded uk-margin"
-                     style="display:none"
-                     data-url-template="{{ path('lieu_details', {'id': 0})|replace({'0':'__ID__'}) }}">
+                <div id="lieu-details" class="uk-alert-primary uk-padding-small uk-border-rounded uk-margin" style="display:none"
+                     data-url-template="{{ path('lieu_details', {'id': 0})|replace({'0':'__ID__'}) }}"></div>
+
+                <div id="lieu-coords" class="uk-grid-small uk-child-width-1-2@s uk-margin" uk-grid style="display:none">
+                    <div>
+                        <label class="uk-form-label">Latitude</label>
+                        <input id="lieu-latitude" class="uk-input uk-border-pill" type="text" readonly>
+                    </div>
+                    <div>
+                        <label class="uk-form-label">Longitude</label>
+                        <input id="lieu-longitude" class="uk-input uk-border-pill" type="text" readonly>
+                    </div>
                 </div>
 
                 <div class="uk-margin">
-                    <button type="submit" class="uk-button uk-button-primary uk-border-pill uk-width-1-1">
-                        Enregistrer la sortie
-                    </button>
+                    <button type="submit" class="uk-button uk-button-primary uk-border-pill uk-width-1-1">Enregistrer la sortie</button>
                 </div>
-
             </fieldset>
             {{ form_end(sortieForm) }}
         </div>
     </div>
 
-    <!-- Modale UIkit -->
+    {# Modal #}
     <div id="modal-lieu" uk-modal>
         <div class="uk-modal-dialog uk-modal-body uk-border-rounded">
             <button class="uk-modal-close-default" type="button" uk-close></button>
             <h2 class="uk-modal-title">Ajouter un Lieu</h2>
 
-            {{ form_start(lieuForm, {'attr': {'class': 'uk-form-stacked'}}) }}
-            {{ form_widget(lieuForm) }}
+            {{ form_start(lieuForm, {'attr': {'class': 'uk-form-stacked', 'id': 'lieu-form'}}) }}
+            {% for field in ['nom','rue','ville','codepostal'] %}
+                <div class="uk-margin">
+                    {{ form_widget(attribute(lieuForm, field), {'attr': {'class':'uk-input uk-border-pill','id':'lieu-' ~ field}}) }}
+                </div>
+            {% endfor %}
+
+            <div class="uk-margin uk-text-center">
+                <button type="button" id="search-map-btn" class="uk-button uk-button-secondary uk-border-pill">
+                    Rechercher sur la carte
+                </button>
+            </div>
+
+            <div class="uk-grid-small uk-child-width-1-2@s" uk-grid>
+                <div>
+                    {{ form_widget(lieuForm.latitude, {'attr': {'class':'uk-input uk-border-pill','id':'modal-latitude','readonly':true}}) }}
+                </div>
+                <div>
+                    {{ form_widget(lieuForm.longitude, {'attr': {'class':'uk-input uk-border-pill','id':'modal-longitude','readonly':true}}) }}
+                </div>
+            </div>
+
             <div class="uk-margin uk-text-right">
                 <button type="button" class="uk-button uk-button-default uk-border-pill uk-modal-close">Annuler</button>
                 <button type="submit" class="uk-button uk-button-primary uk-border-pill">Enregistrer</button>
             </div>
             {{ form_end(lieuForm) }}
 
-            <div id="map" data-controller="map" style="height: 500px; margin-top: 1rem;"></div>
+            <div id="modal-map" style="width:100%; height:400px; margin-top:1rem;"></div>
         </div>
     </div>
+    /* global L, UIkit, Stimulus */
 
-    <!-- CSS y JS externos -->
+    {# CSS & JS externos #}
+    /* global L, UIkit, Stimulus */
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit-icons.min.js"></script>
-
-    <!-- Mapa controlador -->
-    <script type="module" src="{{ asset('controllers/map_controller.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@hotwired/stimulus/dist/stimulus.umd.js"></script>
+    /* global L, UIkit, Stimulus */
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // ---- Detalles del lugar ----
-            const selectLieu = document.querySelector('select[name$="[lieu]"]');
-            const detailsBox = document.getElementById('lieu-details');
-            const urlTemplate = detailsBox ? detailsBox.dataset.urlTemplate : '';
+        /* global L, UIkit, Stimulus */
 
-            async function loadDetails(id) {
-                if (!detailsBox || !id || !urlTemplate) {
-                    detailsBox.style.display = 'none';
-                    detailsBox.innerHTML = '';
+        const application = Stimulus.Application.start();
+
+        class MapController {
+            constructor() {
+                this.mapTarget = document.getElementById('modal-map');
+                this.mapInitialized = false;
+
+                /** @type {L.Map|null} */
+                this.map = null;
+
+                /** @type {L.Marker|null} */
+                this.marker = null;
+            }
+
+            connect() {
+                if (!this.mapTarget) return;
+
+                // Inicializa el mapa solo cuando el modal se abre
+                UIkit.util.on('#modal-lieu', 'shown', () => {
+                    if (!this.mapInitialized) {
+                        this.initMap();
+                        this.mapInitialized = true;
+                    }
+                });
+
+                // Botón de búsqueda
+                const searchBtn = document.getElementById('search-map-btn');
+                if (searchBtn) {
+                    searchBtn.addEventListener('click', () => this.searchAddress());
+                }
+            }
+
+            initMap() {
+                const latitudeInput = document.getElementById('modal-latitude');
+                const longitudeInput = document.getElementById('modal-longitude');
+
+                const lat = latitudeInput?.value ? parseFloat(latitudeInput.value) : 48.8566;
+                const lon = longitudeInput?.value ? parseFloat(longitudeInput.value) : 2.3522;
+
+                // Inicializar mapa
+                this.map = L.map(this.mapTarget).setView([lat, lon], 13);
+
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    attribution: "© OpenStreetMap contributors"
+                }).addTo(this.map);
+
+                // Inicializar marcador
+                this.marker = (!isNaN(lat) && !isNaN(lon)) ? L.marker([lat, lon]).addTo(this.map) : null;
+
+                // Click en mapa
+                this.map.on("click", e => {
+                    const { lat, lng } = e.latlng;
+
+                    if (this.marker) this.marker.setLatLng([lat, lng]);
+                    else this.marker = L.marker([lat, lng]).addTo(this.map);
+
+                    this.marker.bindPopup(`Coordonnées : ${lat.toFixed(5)}, ${lng.toFixed(5)}`).openPopup();
+
+                    if (latitudeInput) latitudeInput.value = lat.toFixed(6);
+                    if (longitudeInput) longitudeInput.value = lng.toFixed(6);
+                });
+            }
+
+            searchAddress() {
+                const modal = document.getElementById('modal-lieu');
+                if (!modal) return;
+
+                const rue = modal.querySelector('#lieu-rue')?.value.trim();
+                const ville = modal.querySelector('#lieu-ville')?.value.trim();
+                const codepostal = modal.querySelector('#lieu-codepostal')?.value.trim();
+
+                const parts = [];
+                if (rue) parts.push(rue);
+                if (ville) parts.push(ville);
+                if (codepostal) parts.push(codepostal);
+
+                if (parts.length === 0) {
+                    alert("Veuillez remplir au moins un champ pour la recherche !");
                     return;
                 }
-                try {
-                    const url = urlTemplate.replace('__ID__', encodeURIComponent(id));
-                    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-                    if (!res.ok) throw new Error('Failed to load');
-                    const d = await res.json();
 
-                    const parts = [];
-                    if (d.nom) parts.push(`<strong>Nom:</strong> ${d.nom}`);
-                    if (d.rue) parts.push(`<strong>Rue:</strong> ${d.rue}`);
-                    const ville = [d.codePostal, d.ville].filter(Boolean).join(' ');
-                    if (ville) parts.push(`<strong>Ville:</strong> ${ville}`);
-                    const coords = [d.latitude, d.longitude].filter(Boolean).join(', ');
-                    if (coords) parts.push(`<strong>Coord.:</strong> ${coords}`);
+                const query = encodeURIComponent(parts.join(' '));
+                const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1&addressdetails=1`;
 
-                    detailsBox.innerHTML = parts.join('<br>');
-                    detailsBox.style.display = parts.length ? 'block' : 'none';
-                } catch {
-                    detailsBox.style.display = 'none';
-                    detailsBox.innerHTML = '';
-                }
+                fetch(url)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            const lat = parseFloat(data[0].lat);
+                            const lon = parseFloat(data[0].lon);
+
+                            if (this.map) this.map.setView([lat, lon], 15);
+
+                            if (this.marker) this.marker.setLatLng([lat, lon]);
+                            else this.marker = L.marker([lat, lon]).addTo(this.map);
+
+                            this.marker.bindPopup(`Coordonnées : ${lat.toFixed(5)}, ${lon.toFixed(5)}`).openPopup();
+
+                            // Actualizar inputs
+                            modal.querySelector('#modal-latitude').value = lat.toFixed(6);
+                            modal.querySelector('#modal-longitude').value = lon.toFixed(6);
+                        } else {
+                            alert("Adresse non trouvée !");
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Erreur lors de la recherche !");
+                    });
             }
+        }
 
-            if (selectLieu) {
-                if (selectLieu.value) loadDetails(selectLieu.value);
-                selectLieu.addEventListener('change', () => loadDetails(selectLieu.value));
-            }
-
-            // ---- Mapa en modal ----
-            const modalLieu = document.getElementById('modal-lieu');
-            const mapDiv = modalLieu.querySelector('#map');
-            let map = null;
-
-            UIkit.util.on(modalLieu, 'shown', () => {
-                if (!map) {
-                    map = L.map(mapDiv).setView([48.8566, 2.3522], 13);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OpenStreetMap contributors'
-                    }).addTo(map);
-                } else {
-                    map.invalidateSize();
-                }
-            });
-
-            const latitudeInput = modalLieu.querySelector('input[name$="[latitude]"]');
-            const longitudeInput = modalLieu.querySelector('input[name$="[longitude]"]');
-
-            function updateMapMarker() {
-                const lat = parseFloat(latitudeInput.value);
-                const lng = parseFloat(longitudeInput.value);
-                if (!isNaN(lat) && !isNaN(lng) && map) {
-                    if (map.marker) map.removeLayer(map.marker);
-                    map.marker = L.marker([lat, lng]).addTo(map);
-                    map.setView([lat, lng], 15);
-                }
-            }
-
-            if (latitudeInput && longitudeInput) {
-                latitudeInput.addEventListener('input', updateMapMarker);
-                longitudeInput.addEventListener('input', updateMapMarker);
-            }
+        // Inicializar controller
+        document.addEventListener('DOMContentLoaded', () => {
+            const mapController = new MapController();
+            mapController.connect();
         });
     </script>
+
+
+
+
+
+
 {% endblock %}
