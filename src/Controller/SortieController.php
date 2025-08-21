@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Lieu;
 use App\Entity\Sortie;
+use App\Form\FiltreSiteType;
 use App\Form\LieuType;
 use App\Form\SortieType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,40 +12,47 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\EtatRepository;
+use App\Repository\SortieRepository;
+
 
 final class SortieController extends AbstractController
 {
     #[Route('/sortie-create', name: 'sortie_create', methods: ['GET', 'POST'])]
-    public function create(Request $request, EntityManagerInterface $em): Response
+    public function create(Request $request, EntityManagerInterface $em, EtatRepository $etatRepository): Response
     {
-        $sortie = new Sortie();
-
         $user = $this->getUser();
         if (!$user) {
             throw $this->createAccessDeniedException('Vous devez être connecté pour créer une sortie.');
         }
-        $sortie->setOrganisateur($user);
 
+        // Crear la nueva salida
+        $sortie = new Sortie();
+        $sortie->setOrganisateur($user);
+        $sortie->setDateCreated(new \DateTimeImmutable());
+
+        // Asignar el estado por defecto (Ej: "Créée")
+        $etatObjet = $etatRepository->find(1); // ID del estado que quieras
+        $sortie->setEtat($etatObjet);
+
+        // Formulario de la salida
         $form = $this->createForm(SortieType::class, $sortie);
         $form->handleRequest($request);
 
-        if (!$sortie->getDateCreated()) {
-            $sortie->setDateCreated(new \DateTimeImmutable());
-        }
-
+        // Formulario de lugar
         $lieu = new Lieu();
         $lieuForm = $this->createForm(LieuType::class, $lieu);
         $lieuForm->handleRequest($request);
 
+        // Procesar formulario de lugar
         if ($lieuForm->isSubmitted() && $lieuForm->isValid()) {
             $em->persist($lieu);
             $em->flush();
 
             $sortie->setLieu($lieu);
-
-            $form = $this->createForm(SortieType::class, $sortie);
         }
 
+        // Procesar formulario de salida
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($sortie);
             $em->flush();
@@ -57,6 +65,7 @@ final class SortieController extends AbstractController
             'lieuForm' => $lieuForm->createView(),
         ]);
     }
+
 
     #[Route('/lieu/{id}/details', name: 'lieu_details', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function lieuDetails(int $id, EntityManagerInterface $em): Response

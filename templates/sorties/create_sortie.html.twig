@@ -12,13 +12,15 @@
 
             {{ form_start(sortieForm, {'attr': {'class': 'uk-form-stacked'}}) }}
             <fieldset class="uk-fieldset">
-                {% for field in ['nom','dateHeureDebut','duree','dateLimiteInscription','nbInscriptionsMax','infoSortie','etat','siteOrganisateur'] %}
-                    {% set widgetClass = field == 'infoSortie' ? 'uk-textarea uk-border-rounded' : (field matches '/^(etat|siteOrganisateur)$/' ? 'uk-select uk-border-pill' : 'uk-input uk-border-pill') %}
+                {# Renderiza solo los campos visibles para el usuario (sin 'etat') #}
+                {% for field in ['nom','dateHeureDebut','duree','dateLimiteInscription','nbInscriptionsMax','infoSortie','siteOrganisateur'] %}
+                    {% set widgetClass = field == 'infoSortie' ? 'uk-textarea uk-border-rounded' : (field == 'siteOrganisateur' ? 'uk-select uk-border-pill' : 'uk-input uk-border-pill') %}
                     <div class="uk-margin">
                         {{ form_row(attribute(sortieForm, field), {'attr': {'class': widgetClass}}) }}
                     </div>
                 {% endfor %}
 
+                {# Campo Lieu #}
                 <div class="uk-margin">
                     {{ form_label(sortieForm.lieu, 'Lieu', {'label_attr': {'class': 'uk-form-label'}}) }}
                     <div class="uk-flex">
@@ -51,7 +53,10 @@
         </div>
     </div>
 
-    {# Modal #}
+
+
+
+    {# MODAL #}
     <div id="modal-lieu" uk-modal>
         <div class="uk-modal-dialog uk-modal-body uk-border-rounded">
             <button class="uk-modal-close-default" type="button" uk-close></button>
@@ -88,39 +93,25 @@
             <div id="modal-map" style="width:100%; height:400px; margin-top:1rem;"></div>
         </div>
     </div>
-    /* global L, UIkit, Stimulus */
 
-    {# CSS & JS externos #}
-    /* global L, UIkit, Stimulus */
-
+    {# CSS & JS externes #}
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit-icons.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@hotwired/stimulus/dist/stimulus.umd.js"></script>
-    /* global L, UIkit, Stimulus */
 
     <script>
-        /* global L, UIkit, Stimulus */
-
-        const application = Stimulus.Application.start();
-
         class MapController {
             constructor() {
                 this.mapTarget = document.getElementById('modal-map');
                 this.mapInitialized = false;
-
-                /** @type {L.Map|null} */
                 this.map = null;
-
-                /** @type {L.Marker|null} */
                 this.marker = null;
             }
 
             connect() {
                 if (!this.mapTarget) return;
 
-                // Inicializa el mapa solo cuando el modal se abre
                 UIkit.util.on('#modal-lieu', 'shown', () => {
                     if (!this.mapInitialized) {
                         this.initMap();
@@ -128,7 +119,6 @@
                     }
                 });
 
-                // Botón de búsqueda
                 const searchBtn = document.getElementById('search-map-btn');
                 if (searchBtn) {
                     searchBtn.addEventListener('click', () => this.searchAddress());
@@ -136,74 +126,46 @@
             }
 
             initMap() {
-                const latitudeInput = document.getElementById('modal-latitude');
-                const longitudeInput = document.getElementById('modal-longitude');
+                const lat = 48.8566; // París por defecto
+                const lon = 2.3522;
 
-                const lat = latitudeInput?.value ? parseFloat(latitudeInput.value) : 48.8566;
-                const lon = longitudeInput?.value ? parseFloat(longitudeInput.value) : 2.3522;
-
-                // Inicializar mapa
                 this.map = L.map(this.mapTarget).setView([lat, lon], 13);
-
                 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
                     attribution: "© OpenStreetMap contributors"
                 }).addTo(this.map);
-
-                // Inicializar marcador
-                this.marker = (!isNaN(lat) && !isNaN(lon)) ? L.marker([lat, lon]).addTo(this.map) : null;
-
-                // Click en mapa
-                this.map.on("click", e => {
-                    const { lat, lng } = e.latlng;
-
-                    if (this.marker) this.marker.setLatLng([lat, lng]);
-                    else this.marker = L.marker([lat, lng]).addTo(this.map);
-
-                    this.marker.bindPopup(`Coordonnées : ${lat.toFixed(5)}, ${lng.toFixed(5)}`).openPopup();
-
-                    if (latitudeInput) latitudeInput.value = lat.toFixed(6);
-                    if (longitudeInput) longitudeInput.value = lng.toFixed(6);
-                });
             }
 
             searchAddress() {
-                const modal = document.getElementById('modal-lieu');
-                if (!modal) return;
+                // Tomamos los campos del LieuType
+                const rue = document.getElementById('lieu_rue')?.value.trim();
+                const ville = document.getElementById('lieu_ville')?.value.trim();
+                const codepostal = document.getElementById('lieu_codepostal')?.value.trim();
 
-                const rue = modal.querySelector('#lieu-rue')?.value.trim();
-                const ville = modal.querySelector('#lieu-ville')?.value.trim();
-                const codepostal = modal.querySelector('#lieu-codepostal')?.value.trim();
-
-                const parts = [];
-                if (rue) parts.push(rue);
-                if (ville) parts.push(ville);
-                if (codepostal) parts.push(codepostal);
-
-                if (parts.length === 0) {
-                    alert("Veuillez remplir au moins un champ pour la recherche !");
+                const query = [rue, ville, codepostal].filter(Boolean).join(" ");
+                if (!query) {
+                    alert("Veuillez remplir au moins un champ !");
                     return;
                 }
 
-                const query = encodeURIComponent(parts.join(' '));
-                const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1&addressdetails=1`;
+                const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
 
                 fetch(url)
                     .then(res => res.json())
                     .then(data => {
-                        if (data && data.length > 0) {
+                        if (data.length > 0) {
                             const lat = parseFloat(data[0].lat);
                             const lon = parseFloat(data[0].lon);
 
-                            if (this.map) this.map.setView([lat, lon], 15);
+                            this.map.setView([lat, lon], 15);
 
                             if (this.marker) this.marker.setLatLng([lat, lon]);
                             else this.marker = L.marker([lat, lon]).addTo(this.map);
 
-                            this.marker.bindPopup(`Coordonnées : ${lat.toFixed(5)}, ${lon.toFixed(5)}`).openPopup();
+                            this.marker.bindPopup(query).openPopup();
 
-                            // Actualizar inputs
-                            modal.querySelector('#modal-latitude').value = lat.toFixed(6);
-                            modal.querySelector('#modal-longitude').value = lon.toFixed(6);
+                            // Actualizamos los inputs de latitud y longitud
+                            document.getElementById('lieu_latitude').value = lat.toFixed(6);
+                            document.getElementById('lieu_longitude').value = lon.toFixed(6);
                         } else {
                             alert("Adresse non trouvée !");
                         }
@@ -215,15 +177,12 @@
             }
         }
 
-        // Inicializar controller
+        // Inicializar el controller cuando cargue la página
         document.addEventListener('DOMContentLoaded', () => {
             const mapController = new MapController();
             mapController.connect();
         });
     </script>
-
-
-
 
 
 

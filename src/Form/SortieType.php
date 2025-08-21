@@ -9,6 +9,7 @@ use App\Entity\Sortie;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -28,10 +29,9 @@ final class SortieType extends AbstractType
             ])
             ->add('nbInscriptionsMax')
             ->add('infoSortie')
-            ->add('etat', EntityType::class, [
-                'class' => Etat::class,
-                'choice_label' => 'libelle',
-            ])
+//            ->add('etat', HiddenType::class, [
+//            'mapped' => true,
+//         ])
             ->add('siteOrganisateur', EntityType::class, [
                 'class' => Site::class,
                 'choice_label' => 'nom', // ajusta al campo visible de tu entidad Site
