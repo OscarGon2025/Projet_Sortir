@@ -39,6 +39,9 @@
                     {% endif %}
                     <li class="uk-visible@s"><a href="/sortie-create">Create</a></li>
                     <li class="uk-visible@s"><a href="/sortie-list">List</a></li>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <li class="uk-visible@s"><a href="{{ path('admin_import_users') }}">Admin</a></li>
+                    {% endif %}
 
                     <li><a class="uk-navbar-toggle" data-uk-toggle data-uk-navbar-toggle-icon href="#offcanvas-nav"></a></li>
                 </ul>

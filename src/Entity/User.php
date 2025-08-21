@@ -182,6 +182,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+//     public function getRoles(): array
+//     {
+//         if ($this->administrateur) {
+//             return ['ROLE_ADMIN', 'ROLE_USER'];
+//         }
+//         return ['ROLE_USER'];
+//     }
+
     public function isActif(): ?bool
     {
         return $this->actif;
@@ -282,7 +290,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
 
     public function eraseCredentials()
     {
