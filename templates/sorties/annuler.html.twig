@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Annuler une sortie{% endblock %}
+
+{% block body %}
+    <h1>Annuler la sortie : {{ sortie.nom }}</h1>
+
+    {{ form_start(form) }}
+    {{ form_row(form.motifAnnulation) }}
+    <button type="submit" class="btn btn-danger">Confirmer l’annulation</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('sortie_show', {'id': sortie.id}) }}">Retour</a>
+{% endblock %}

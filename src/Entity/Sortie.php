@@ -52,6 +52,9 @@ class Sortie
     #[ORM\Column(type: Types::TEXT)]
     private ?string $infoSortie = null;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $motifAnnulation = null;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Etat $etat = null;
@@ -76,7 +79,7 @@ class Sortie
     }
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true,onDelete: "SET NULL")]
     private ?User $organisateur = null;
 
     /** @var Collection<int, User> */
@@ -215,4 +218,30 @@ class Sortie
 
         return $this;
     }
+
+}
+//ATTENTION !!!!!!!!!!!------>>>>>>
+    public function getLieu(): ?Lieu
+    {
+        return $this->Lieu;
+    }
+
+    public function setLieu(?Lieu $Lieu): static
+    {
+        $this->Lieu = $Lieu;
+
+        return $this;
+    }
+
+    public function getMotifAnnulation(): ?string
+    {
+        return $this->motifAnnulation;
+    }
+
+    public function setMotifAnnulation(?string $motif): self
+    {
+        $this->motifAnnulation = $motif;
+        return $this;
+    }
+
 }

@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Importer des utilisateurs{% endblock %}
+
+{% block body %}
+    <div class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-height-viewport uk-overflow-hidden uk-light" data-uk-height-viewport>
+        <!-- overlay -->
+        <div class="uk-position-cover uk-overlay-primary"></div>
+
+        <div class="uk-width-large uk-padding-small uk-position-z-index" uk-scrollspy="cls: uk-animation-fade">
+            <div class="uk-text-center uk-margin">
+                <h1 class="uk-heading-line"><span>Importer des utilisateurs</span></h1>
+            </div>
+
+            {% if message %}
+                <div class="uk-alert-success" uk-alert>
+                    <a href="#" class="uk-alert-close" uk-close></a>
+                    <p>{{ message }}</p>
+                </div>
+            {% endif %}
+
+            <form action="{{ path('admin_import_users') }}" method="post" enctype="multipart/form-data" class="uk-background-muted uk-padding uk-border-rounded">
+
+                <div class="uk-margin">
+                    <div class="uk-placeholder uk-text-center uk-border-rounded uk-padding-large uk-background-default" style="color: #333;" uk-form-custom>
+                        <div>
+                            <span uk-icon="icon: cloud-upload; ratio: 2" class="uk-margin-small-bottom" style="color: #666;"></span>
+                            <p class="uk-text-bold">Cliquez ici pour choisir un fichier</p>
+                            <p class="uk-text-meta">Format accepté : .csv uniquement</p>
+                        </div>
+                        <input type="file" name="csv_file" id="csv_file" accept=".csv" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;">
+                    </div>
+                </div>
+
+                <div class="uk-margin">
+                    <button type="submit" class="uk-button uk-button-primary uk-border-pill uk-width-1-1">Importer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JS UIkit -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@latest/dist/js/uikit-icons.min.js"></script>
+{% endblock %}

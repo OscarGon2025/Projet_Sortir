@@ -16,6 +16,41 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
+    public function desactiverUsers(array $userIds): int
+    {
+        return $this->createQueryBuilder('u')
+            ->update()
+            ->set('u.actif', ':inactif')
+            ->where('u.id IN (:ids)')
+            ->setParameter('inactif', false)
+            ->setParameter('ids', $userIds)
+            ->getQuery()
+            ->execute();
+    }
+
+    public function supprimerUsers(array $ids): int
+    {
+        return $this->createQueryBuilder('u')
+            ->delete()
+            ->where('u.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->execute();
+    }
+
+    public function reactiverUsers(array $ids): int
+    {
+        return $this->createQueryBuilder('u')
+            ->update()
+            ->set('u.actif', ':active')
+            ->where('u.id IN (:ids)')
+            ->setParameter('active', true)
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->execute();
+    }
+
+
     //    /**
     //     * @return User[] Returns an array of User objects
     //     */

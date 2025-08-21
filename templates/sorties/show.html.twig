@@ -1,17 +1,28 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Détails de la sortie{% endblock %}
-
+{#
 {% block body %}
+
     <h1>{{ sortie.nom }}</h1>
     <p><strong>État :</strong> {{ sortie.etat.libelle }}</p>
     <p><strong>Places disponibles :</strong> {{ sortie.nbInscriptionsMax }}</p>
     <p><strong>Places restantes :</strong> {{ sortie.nbInscriptionsMax - (sortie.users | length) }}</p>
-    <p><strong>Organisateur :</strong> {{ sortie.organisateur.username }}</p>
+    <p><strong>Organisateur :</strong> {{ sortie.organisateur ? sortie.organisateur.username : 'Organisateur supprimé' }}</p>
     <p><strong>Date limite d'inscription :</strong>
+
+        <h3>Statut de la sortie :</h3>
         {{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y H:i') : 'Non définie' }}</p>
 
-    {% set inscrit = sortie.users|length > 0 %}
+    {% set inscrit = false %}
+    {% if app.user %}
+        {% for participant in sortie.users %}
+            {% if participant.id == app.user.id %}
+                {% set inscrit = true %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
 
     {% if sortie.etat.libelle|lower == 'ouverte' and sortie.dateLimiteInscription > "now"|date("Y-m-d H:i:s") %}
 
@@ -25,9 +36,13 @@
         <form action="{{ path('sortie_inscription', { id: sortie.id }) }}" method="POST">
             <button type="submit" class="btn btn-success">S'inscrire</button>
         </form>
-
          {% endif %}
 
+
+        {# Pour test temporaire. #}
+{#        <p>Inscrit : {{ inscrit ? 'oui' : 'non' }}</p>#}
+
+{#
     {% else %}
         <button class="btn btn-secondary" disabled>Inscriptions fermées</button>
     {% endif %}
@@ -40,7 +55,7 @@
     <a href="{{ path('app_sortie') }}" class="btn btn-link mt-3">Retour à la liste</a>
 
 
-    <h3>Utilisateurs inscrits</h3>
+    <h3>Utilisateurs inscrits :</h3>
 
     {% if sortie.users|length > 0 %}
         <ul>
@@ -55,5 +70,89 @@
     {% else %}
         <p>Aucun utilisateur inscrit pour l'instant.</p>
     {% endif %}
+
+
+
+    {% if app.user and sortie.organisateur.id == app.user.id and not estCloturee and sortie.etat.libelle != 'Annulée' %}
+        <h3>Annuler la sortie :</h3>
+        <form method="post" action="{{ path('sortie_annuler', {'id': sortie.id}) }}" onsubmit="return confirm('Confirmer l\'annulation de la sortie ?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('annuler' ~ sortie.id) }}">
+            <button type="submit" class="btn btn-danger">Annuler la sortie</button>
+        </form>
+
+        {% if sortie.etat.libelle == 'Annulée' and sortie.motifAnnulation %}
+            <div class="alert alert-warning">
+                <strong>Motif de l’annulation :</strong><br>
+                {{ sortie.motifAnnulation|nl2br }} #}
+
+
+    <div class="uk-background-secondary uk-light uk-padding-small uk-padding-top-large uk-height-viewport">
+
+        <!-- Conteneur central avec marges -->
+        <div class="uk-container uk-margin-large-top uk-margin-large-bottom">
+
+            <h1 class="uk-heading-line uk-text-center"><span>{{ sortie.nom }}</span></h1>
+
+            <div class="uk-card uk-card-default uk-card-body uk-background-secondary uk-light">
+
+                <p><strong>État :</strong> {{ sortie.etat.libelle }}</p>
+                <p><strong>Places disponibles :</strong> {{ sortie.nbInscriptionsMax }}</p>
+                <p><strong>Places restantes :</strong> {{ sortie.nbInscriptionsMax - (sortie.users | length) }}</p>
+                <p><strong>Organisateur :</strong> {{ sortie.organisateur.username }}</p>
+                <p><strong>Date limite d'inscription :</strong>
+                    {{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y H:i') : 'Non définie' }}
+                </p>
+
+                {% set inscrit = sortie.users|length > 0 %}
+
+                <div class="uk-text-center uk-margin">
+                    {% if sortie.etat.libelle|lower == 'ouverte' and sortie.dateLimiteInscription > "now"|date("Y-m-d H:i:s") %}
+                        {% if inscrit %}
+                            {% if sortie.dateHeureDebut > "now"|date("Y-m-d H:i:s") %}
+                                <form action="{{ path('sortie_desinscription', { id: sortie.id }) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="uk-button uk-button-warning uk-border-pill">Se désinscrire</button>
+                                </form>
+                            {% endif %}
+                        {% else %}
+                            <form action="{{ path('sortie_inscription', { id: sortie.id }) }}" method="POST">
+                                <button type="submit" class="uk-button uk-button-primary uk-border-pill">S'inscrire</button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <button class="uk-button uk-button-secondary uk-border-pill" disabled>Inscriptions fermées</button>
+                    {% endif %}
+                </div>
+
+                {% if estCloturee %}
+                    <div class="uk-alert-danger uk-text-small uk-margin-small-top uk-text-center" uk-alert>
+                        <p class="uk-margin-remove">Cette sortie est clôturée.</p>
+                    </div>
+                {% endif %}
+
+                <div class="uk-text-center uk-margin-top">
+                    <a href="{{ path('app_sortie') }}" class="uk-button uk-button-default uk-border-pill">← Retour à la liste</a>
+                </div>
+
+                <h3 class="uk-margin-top">Utilisateurs inscrits</h3>
+
+                {% if sortie.users|length > 0 %}
+                    <ul class="uk-list uk-list-divider">
+                        {% for user in sortie.users %}
+                            <li>
+                                <a href="{{ path('user_profile_public', { id: user.id }) }}">
+                                    {{ user.username }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="uk-text-meta">Aucun utilisateur inscrit pour l'instant.</p>
+                {% endif %}
+
+            </div>
+
+        </div>
+    </div>
+
 
 {% endblock %}

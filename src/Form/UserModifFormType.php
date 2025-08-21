@@ -11,6 +11,8 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
 
 class UserModifFormType extends AbstractType
 {
@@ -23,6 +25,19 @@ class UserModifFormType extends AbstractType
             ->add('telephone', TextType::class, ['label' => 'Téléphone'])
 //            ->add('password', TextType::class, ['label' => 'Mot de passe'])
             ->add('mail', EmailType::class, ['label' => 'Adresse mail'])
+            //Ajout de l'upload de la photo.
+            ->add('photo', FileType::class, [
+                'label' => 'Photo de profil',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '2M',
+                        'mimeTypes' => ['image/jpeg', 'image/png'],
+                        'mimeTypesMessage' => 'Merci d\'uploader une image JPG ou PNG.',
+                    ])
+                ],
+            ]);
         ;
     }
 

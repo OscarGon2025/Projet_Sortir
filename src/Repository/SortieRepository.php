@@ -16,15 +16,38 @@ class SortieRepository extends ServiceEntityRepository
         parent::__construct($registry, Sortie::class);
     }
 
-    public function findBySite(int $siteId): array
+    public function findBySite(?int $siteId): array
     {
+        $now = new \DateTimeImmutable();
+
+        $qb = $this->createQueryBuilder('s')
+            ->andWhere('s.dateHeureDebut >= :limit')
+            ->setParameter('limit', $now->modify('-1 month'))
+            ->orderBy('s.dateHeureDebut', 'ASC');
+
+        if ($siteId) {
+            $qb->andWhere('s.siteOrganisateur = :siteId')
+                ->setParameter('siteId', $siteId);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+
+
+    public function findSortiesArchivees(): array
+    {
+        $now = new \DateTimeImmutable(); // date actuelle
         return $this->createQueryBuilder('s')
-            ->andWhere('s.siteOrganisateur = :siteId')
-            ->setParameter('siteId', $siteId)
-            ->orderBy('s.dateHeureDebut', 'ASC') // ou DESC
+            ->andWhere('s.dateHeureDebut < :limit')
+            ->setParameter('limit', $now->modify('-1 month'))
+            ->orderBy('s.dateHeureDebut', 'DESC')
             ->getQuery()
             ->getResult();
     }
+
+
+
 
 
 //    /**

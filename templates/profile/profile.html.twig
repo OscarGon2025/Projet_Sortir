@@ -3,15 +3,37 @@
 {% block title %}Profil Utilisateur{% endblock %}
 
 {% block body %}
+    <div class="uk-background-secondary uk-light uk-padding-small uk-padding-top-large uk-height-viewport">
+        <div class="uk-container uk-margin-large-top uk-margin-large-bottom">
 
-    <h2>Bienvenue sur votre profil utilisateur {{ user.username }}</h2>
+            <h2 class="uk-heading-line uk-text-center"><span>Bienvenue {{ user.username }}</span></h2>
 
-    <p>Pseudo : {{ user.username }}</p>
-    <p>Nom : {{ user.nom }}</p>
-    <p>Prénom : {{ user.prenom }}</p>
-    <p>Téléphone : {{ user.telephone }}</p>
-    <p>Mail : {{ user.mail }}</p>
-{#    <p>Mot de passe : {{ user.password }}</p>#}
-    <a href="{{ path('app_change_password') }}" class="btn btn-primary">Changer mon mot de passe</a>
+
+            <div class="uk-card uk-card-default uk-card-body uk-background-secondary uk-light uk-border-rounded uk-width-1-2@m uk-margin-auto">
+
+                <p><strong>Pseudo :</strong> {{ user.username }}</p>
+                <p><strong>Nom :</strong> {{ user.nom }}</p>
+                <p><strong>Prénom :</strong> {{ user.prenom }}</p>
+                <p><strong>Téléphone :</strong> {{ user.telephone }}</p>
+                <p><strong>Mail :</strong> {{ user.mail }}</p>
+
+                <div class="uk-text-center uk-margin-top">
+                    <a href="{{ path('app_change_password') }}" class="uk-button uk-button-primary uk-border-pill">
+                        Changer mon mot de passe
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+   
+
+    {% if user.photoFilename %}
+        <img src="{{ asset('uploads/photos/' ~ user.photoFilename) }}" alt="Photo de profil" width="150" height="150">
+    {% else %}
+        <img src="{{ asset('images/avatardefault.jpg') }}" alt="Photo de profil par défaut" width="150" height="150">
+    {% endif %}
+
 
 {% endblock %}

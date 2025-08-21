@@ -65,10 +65,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 //    #[ORM\JoinColumn(nullable: false)]
     private ?Site $estRattacheA = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $photoFilename = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $resetToken = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $resetTokenExpiresAt = null;
+
+    #[ORM\Column(type: 'json', nullable: false)]
+    private array $roles = [];
+
+
+
     public function __construct()
     {
         $this->sorties = new ArrayCollection();
         $this->estInscrit = new ArrayCollection();
+//        $this->roles = [];
     }
 
     public function getId(): ?int
@@ -167,6 +182,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+//     public function getRoles(): array
+//     {
+//         if ($this->administrateur) {
+//             return ['ROLE_ADMIN', 'ROLE_USER'];
+//         }
+//         return ['ROLE_USER'];
+//     }
+
     public function isActif(): ?bool
     {
         return $this->actif;
@@ -247,8 +270,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        // TODO: Implement getRoles() method.
-        return ['ROLE_USER'];
+        // si jamais roles est null (vieux enregistrement ou mauvaise hydratation), on force []
+        $roles = $this->roles ?? [];
+
+        // Cela garantit que tout utilisateur ait au moins le ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        //Si le booléen administrateur est à true, on ajoute ROLE_ADMIN
+        if ($this->administrateur) {
+            $roles[] = 'ROLE_ADMIN';
+        }
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
     }
 
     public function eraseCredentials()
@@ -261,4 +301,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // TODO: Implement getUserIdentifier() method.
         return $this->username;
     }
+
+    public function getPhotoFilename(): ?string
+    {
+        return $this->photoFilename;
+    }
+
+    public function setPhotoFilename(?string $photoFilename): static
+    {
+        $this->photoFilename = $photoFilename;
+        return $this;
+    }
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function setResetToken(?string $resetToken): self
+    {
+        $this->resetToken = $resetToken;
+        return $this;
+    }
+
+    public function getResetTokenExpiresAt(): ?\DateTimeInterface
+    {
+        return $this->resetTokenExpiresAt;
+    }
+
+    public function setResetTokenExpiresAt(?\DateTimeInterface $resetTokenExpiresAt): self
+    {
+        $this->resetTokenExpiresAt = $resetTokenExpiresAt;
+        return $this;
+    }
+
 }
