@@ -68,7 +68,7 @@ class Sortie
     private ?Lieu $Lieu = null;
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true,onDelete: "SET NULL")]
     private ?User $organisateur = null;
 
     /** @var Collection<int, User> */

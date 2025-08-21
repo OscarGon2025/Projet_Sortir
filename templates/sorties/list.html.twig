@@ -27,7 +27,8 @@
 
                     <p><strong>État :</strong> {{ sortie.etat.libelle }}</p>
                     <p><strong>Lieu :</strong> {{ sortie.Lieu.nom }}</p>
-                    <p><strong>Organisateur :</strong> {{ sortie.organisateur.username }}</p>
+                    <p><strong>Organisateur :</strong> {{ sortie.organisateur ? sortie.organisateur.username : 'Organisateur supprimé' }}
+                    </p>
                     <p><strong>Date limite :</strong>
                         {{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y H:i') : 'Non définie' }}
                     </p>

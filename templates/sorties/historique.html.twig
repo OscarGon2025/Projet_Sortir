@@ -9,7 +9,8 @@
                     <hr class="uk-margin-small-top uk-margin-small-bottom">
 
                     <p><strong>Lieu :</strong> {{ sortie.Lieu.nom }}</p>
-                    <p><strong>Organisateur :</strong> {{ sortie.organisateur.username }}</p>
+                    <p><strong>Organisateur :</strong> {{ sortie.organisateur ? sortie.organisateur.username : 'Organisateur supprimé' }}
+                    </p>
                     <p><strong>Date :</strong> {{ sortie.dateHeureDebut | date('d/m/Y H:i') }}</p>
 
                     <p><strong>Participants :</strong></p>

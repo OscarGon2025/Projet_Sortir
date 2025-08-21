@@ -64,7 +64,7 @@
 		<!-- /login -->
 
 		<!-- recover password -->
-		<form class="toggle-class" action="app_main" hidden>
+		<form class="toggle-class" action="{{ path('app_forgot_password') }}" method="post" hidden>
 			<div class="uk-margin-small">
 				<div class="uk-inline uk-width-1-1">
 					<span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: mail"></span>
@@ -84,7 +84,7 @@
 		<!-- action buttons -->
 		<div>
 			<div class="uk-text-center">
-				<a class="uk-link-reset uk-text-small toggle-class" data-uk-toggle="target: .toggle-class ;animation: uk-animation-fade">Forgot your password?</a>
+				<a href={{ path('app_forgot_password')}} class="uk-link-reset uk-text-small">Mot de passe oublié ?</a>
 				<a class="uk-link-reset uk-text-small toggle-class" data-uk-toggle="target: .toggle-class ;animation: uk-animation-fade" hidden><span data-uk-icon="arrow-left"></span> Back to Login</a>
 			</div>
 		</div>

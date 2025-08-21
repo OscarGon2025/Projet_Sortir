@@ -7,7 +7,7 @@
     <p><strong>État :</strong> {{ sortie.etat.libelle }}</p>
     <p><strong>Places disponibles :</strong> {{ sortie.nbInscriptionsMax }}</p>
     <p><strong>Places restantes :</strong> {{ sortie.nbInscriptionsMax - (sortie.users | length) }}</p>
-    <p><strong>Organisateur :</strong> {{ sortie.organisateur.username }}</p>
+    <p><strong>Organisateur :</strong> {{ sortie.organisateur ? sortie.organisateur.username : 'Organisateur supprimé' }}</p>
     <p><strong>Date limite d'inscription :</strong>
 
         <h3>Statut de la sortie :</h3>
