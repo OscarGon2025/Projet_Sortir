@@ -7,12 +7,15 @@ use App\Form\ChangePasswordFormType;
 use App\Form\UserModifFormType;
 use Doctrine\ORM\EntityManagerInterface;
 //use http\Env\Request;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 final class SecurityController extends AbstractController
 {
@@ -56,7 +59,7 @@ final class SecurityController extends AbstractController
     }
 
     #[Route('/profile/edit', name: 'app_profile_edit')]
-    public function editProfile(Request $request, EntityManagerInterface $em): Response
+    public function editProfile(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response
     {
         $user = $this->getUser();
 
@@ -68,6 +71,59 @@ final class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $photoFile */
+            $photoFile = $form->get('photo')->getData();
+
+            if ($photoFile) {
+                //Vérifier que le format de l'image est autorisé.
+//                $originalFilename = pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME);
+//                $safeFilename = $slugger->slug($originalFilename);
+//                $newFilename = uniqid() . '.' . $photoFile->guessExtension();
+                $allowedMimeTypes = ['image/jpeg', 'image/png'];
+                if (!in_array($photoFile->getMimeType(), $allowedMimeTypes)) {
+                    $this->addFlash('error', 'Format de fichier non autorisé. Veuillez choisir un fichier JPG ou PNG.');
+                    return $this->redirectToRoute('app_profile_edit');
+                }
+
+                //Vérifier la taille max de l'image.
+                if ($photoFile->getSize() > 2 * 1024 * 1024) {
+                    $this->addFlash('error', 'Fichier trop volumineux (max 2 Mo).');
+                    return $this->redirectToRoute('app_profile_edit');
+                }
+
+                //Vérifier le contenu réel de l'image
+                $imageCheck = @imagecreatefromstring(file_get_contents($photoFile->getPathname()));
+
+
+                //Créer un nom de fichier sécurisé
+                $originalFilename = pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $photoFile->guessExtension();
+
+
+                // Pour supprimer l'ancienne photo si déjà une existante
+                $oldPhoto = $user->getPhotoFilename();
+                if ($oldPhoto) {
+                    $oldPhotoPath = $this->getParameter('photos_directory') . '/' . $oldPhoto;
+                    if (file_exists($oldPhotoPath)) {
+                        unlink($oldPhotoPath);
+                    }
+                }
+
+                //Déplacement du fichier photo dans le dossier prévu
+                    try {
+                        $photoFile->move(
+                            $this->getParameter('photos_directory'),
+                            $newFilename);
+                    }
+                    catch (FileException $e) {
+                    $this->addFlash('error', "Erreur lors de l'upload de la photo : " . $e->getMessage());
+                    return $this->redirectToRoute('app_profile_edit');
+                }
+
+
+                $user->setPhotoFilename($newFilename);
+            }
 
             $em->persist($user);
             $em->flush();
@@ -79,6 +135,7 @@ final class SecurityController extends AbstractController
 
         return $this->render('profile/edit.html.twig', [
             'form' => $form->createView(),
+            'user' => $user,
         ]);
     }
 

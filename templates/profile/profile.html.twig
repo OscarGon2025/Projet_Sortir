@@ -8,6 +8,7 @@
 
             <h2 class="uk-heading-line uk-text-center"><span>Bienvenue {{ user.username }}</span></h2>
 
+
             <div class="uk-card uk-card-default uk-card-body uk-background-secondary uk-light uk-border-rounded uk-width-1-2@m uk-margin-auto">
 
                 <p><strong>Pseudo :</strong> {{ user.username }}</p>
@@ -25,4 +26,14 @@
             </div>
         </div>
     </div>
+
+   
+
+    {% if user.photoFilename %}
+        <img src="{{ asset('uploads/photos/' ~ user.photoFilename) }}" alt="Photo de profil" width="150" height="150">
+    {% else %}
+        <img src="{{ asset('images/avatardefault.jpg') }}" alt="Photo de profil par défaut" width="150" height="150">
+    {% endif %}
+
+
 {% endblock %}

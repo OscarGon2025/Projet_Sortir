@@ -6,6 +6,7 @@ namespace App\Controller;
 use App\Entity\Site;
 use App\Entity\Etat;
 use App\Entity\Sortie;
+use App\Form\AnnulationType;
 use App\Form\FiltreSiteType;
 use App\Form\SortieType;
 use App\Repository\SortieRepository;
@@ -74,9 +75,11 @@ final class SortieController extends AbstractController
             $site = $formFiltre->get('site')->getData();
         }
 
+
         $sorties = $sortieRepository->findBySite($site ? $site->getId() : null);
 
         return $this->render('sorties/list.html.twig', [
+
             'sorties' => $sorties,
             'formFiltre' => $formFiltre->createView(),
         ]);
@@ -87,26 +90,83 @@ final class SortieController extends AbstractController
     public function show(int $id, EntityManagerInterface $em): Response
     {
         $sortie = $em->getRepository(Sortie::class)->find($id);
+        $user = $this->getUser();
 
         if (!$sortie) {
             throw $this->createNotFoundException("Sortie non trouvée.");
         }
 
-        $now = new \DateTimeImmutable();
-
-        // Considérons qu'une sortie est clôturée si son état est "Clôturée"
-        // ou si la date de début est passée
-        $estCloturee = false;
-        if (strtolower($sortie->getEtat()->getLibelle()) === 'clôturée' || strtolower($sortie->getEtat()->getLibelle()) === 'cloturée') {
-            $estCloturee = true;
-        } elseif ($sortie->getDateHeureDebut() < $now) {
-            $estCloturee = true;
+        // Vérifier si l'utilisateur est inscrit
+        $inscrit = false;
+        if ($user && $sortie->getUsers()->contains($user)) {
+            $inscrit = true;
         }
+
+        // Déterminer si la sortie est clôturée
+        $now = new \DateTimeImmutable();
+        $etat = strtolower($sortie->getEtat()->getLibelle());
+        $estCloturee = $etat === 'clôturée' || $etat === 'cloturée' || $sortie->getDateHeureDebut() < $now;
 
         return $this->render('sorties/show.html.twig', [
             'sortie' => $sortie,
             'estCloturee' => $estCloturee,
+            'inscrit' => $inscrit,
         ]);
+    }
+
+    #[Route('/sortie/{id}/annuler', name: 'sortie_annuler', methods: ['POST'])]
+    public function annuler(int $id, Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw $this->createAccessDeniedException('Vous devez être connecté pour annuler une sortie.');
+        }
+
+        $sortie = $em->getRepository(Sortie::class)->find($id);
+
+        if (!$sortie) {
+            throw $this->createNotFoundException('Sortie non trouvée.');
+        }
+
+        // Vérifie que l'utilisateur est bien l'organisateur
+        if ($sortie->getOrganisateur() !== $user) {
+            throw $this->createAccessDeniedException("Vous n'êtes pas l'organisateur de cette sortie.");
+        }
+
+        $form = $this->createForm(AnnulationType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+//            // Vérif CSRF (optionnelle si pas déjà intégrée dans le formulaire)
+//            $submittedToken = $request->request->get('_token');
+//            if (!$this->isCsrfTokenValid('annuler' . $id, $submittedToken)) {
+//                throw $this->createAccessDeniedException('Token CSRF invalide.');
+//            }
+
+            $motif = $form->get('motifAnnulation')->getData();
+
+            // État "Annulée"
+            $etatAnnulee = $em->getRepository(\App\Entity\Etat::class)->findOneBy(['libelle' => 'Annulée']);
+            if (!$etatAnnulee) {
+                throw new \Exception("L'état 'Annulée' est introuvable.");
+            }
+
+            $sortie->setEtat($etatAnnulee);
+            $sortie->setMotifAnnulation($motif);
+            $em->persist($sortie);
+            $em->flush();
+
+            $this->addFlash('success', "Sortie annulée avec succès.");
+            return $this->redirectToRoute('sortie_show', ['id' => $id]);
+        }
+
+        return $this->render('sorties/annuler.html.twig', [
+            'sortie' => $sortie,
+            'form' => $form->createView(),
+        ]);
+
+
     }
 
     #[Route('/sortie/{id}/inscription', name: 'sortie_inscription', methods: ['GET', 'POST'])]
@@ -148,11 +208,13 @@ final class SortieController extends AbstractController
 
         // Inscription
         $sortie->addUser($user);
+
+        $user->addEstInscrit($sortie);
         $em->persist($sortie);
         $em->flush();
 
         $this->addFlash('success', 'Inscription réussie à la sortie !');
-        return $this->redirectToRoute('app_sortie');
+        return $this->redirectToRoute('sortie_show', ['id' => $id]);
     }
 
     #[Route('/sortie/{id}/desinscription', name: 'sortie_desinscription', methods: ['POST'])]
@@ -183,7 +245,10 @@ final class SortieController extends AbstractController
             return $this->redirectToRoute('sortie_show', ['id' => $id]);
         }
 
+        // Désinscription
         $sortie->removeUser($user);
+
+        $user->removeEstInscrit($sortie);
         $em->persist($sortie);
         $em->flush();
 
