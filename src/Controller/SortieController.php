@@ -2,67 +2,95 @@
 
 namespace App\Controller;
 
-
-use App\Entity\Site;
-use App\Entity\Etat;
+use App\Entity\Lieu;
 use App\Entity\Sortie;
 use App\Form\AnnulationType;
 use App\Form\FiltreSiteType;
+use App\Form\LieuType;
 use App\Form\SortieType;
-use App\Repository\SortieRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use http\Client\Curl\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\EtatRepository;
+use App\Repository\SortieRepository;
+
 
 final class SortieController extends AbstractController
 {
-//    #[Route('/sorties', name: 'app_sorties')]
-//    public function indexSorties(): Response
-//    {
-//        return $this->render('sorties/list.html.twig', [
-//            'controller_name' => 'SortieController',
-//        ]);
-//    }
-
     #[Route('/sortie-create', name: 'sortie_create', methods: ['GET', 'POST'])]
-    public function create(Request $request, EntityManagerInterface $em): Response
+    public function create(Request $request, EntityManagerInterface $em, EtatRepository $etatRepository): Response
     {
-        $sortie = new Sortie();
-
-        // Assigner l’organisateur connecté
         $user = $this->getUser();
-
         if (!$user) {
             throw $this->createAccessDeniedException('Vous devez être connecté pour créer une sortie.');
         }
+
+        // Crear la nueva salida
+        $sortie = new Sortie();
         $sortie->setOrganisateur($user);
+        $sortie->setDateCreated(new \DateTimeImmutable());
 
+        // Asignar el estado por defecto (Ej: "Créée")
+        $etatObjet = $etatRepository->find(1); // ID del estado que quieras
+        $sortie->setEtat($etatObjet);
+
+        // Formulario de la salida
         $form = $this->createForm(SortieType::class, $sortie);
-
         $form->handleRequest($request);
 
-        if (!$sortie->getDateCreated()) {
-            $sortie->setDateCreated(new \DateTimeImmutable());
+        // Formulario de lugar
+        $lieu = new Lieu();
+        $lieuForm = $this->createForm(LieuType::class, $lieu);
+        $lieuForm->handleRequest($request);
+
+        // Procesar formulario de lugar
+        if ($lieuForm->isSubmitted() && $lieuForm->isValid()) {
+            $em->persist($lieu);
+            $em->flush();
+
+            $sortie->setLieu($lieu);
         }
 
-
+        // Procesar formulario de salida
         if ($form->isSubmitted() && $form->isValid()) {
-
             $em->persist($sortie);
             $em->flush();
 
-            $this->addFlash("success", "Sortie créée.");
-
-            return $this->redirectToRoute('app_sortie', ['id' => $sortie->getId()]);
+            return $this->redirectToRoute('sortie_create');
         }
 
         return $this->render('sorties/create_sortie.html.twig', [
             'sortieForm' => $form->createView(),
+            'lieuForm' => $lieuForm->createView(),
         ]);
     }
+
+
+    #[Route('/lieu/{id}/details', name: 'lieu_details', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function lieuDetails(int $id, EntityManagerInterface $em): Response
+    {
+        $lieu = $em->getRepository(Lieu::class)->find($id);
+
+        if (!$lieu) {
+            return $this->json(['message' => 'Lieu not found'], 404);
+        }
+
+        return $this->json([
+            'id' => $lieu->getId(),
+            'nom' => $lieu->getNom(),
+            'rue' => $lieu->getRue(),
+            'ville' => $lieu->getVille(),
+            'codePostal' => $lieu->getCodePostal(),
+            'latitude' => $lieu->getLatitude(),
+            'longitude' => $lieu->getLongitude(),
+        ]);
+    }
+
+
+
+
 
     #[Route('/sortie-list', name: 'app_sortie', methods: ['GET', 'POST'])]
     public function list(Request $request, SortieRepository $sortieRepository): Response
@@ -75,8 +103,9 @@ final class SortieController extends AbstractController
             $site = $formFiltre->get('site')->getData();
         }
 
-
+// ATENCIIONNN!NNNNNNNN!!!!!!
         $sorties = $sortieRepository->findBySite($site ? $site->getId() : null);
+
 
         return $this->render('sorties/list.html.twig', [
 
@@ -234,8 +263,8 @@ final class SortieController extends AbstractController
 
         //Empêcher le user de se désinscrire alors que la sortie a déjà commencé.
         $maintenant = new \DateTimeImmutable();
-        if($sortie->getDateHeureDebut() <= $maintenant) {
-            $this->addFlash('error' , 'La sortie a déjà commencé, vous ne pouvez plus vous désinscrire.');
+        if ($sortie->getDateHeureDebut() <= $maintenant) {
+            $this->addFlash('error', 'La sortie a déjà commencé, vous ne pouvez plus vous désinscrire.');
             return $this->redirectToRoute('sortie_show', ['id' => $id]);
         }
 

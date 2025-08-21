@@ -3,16 +3,17 @@
 namespace App\Form;
 
 use App\Entity\Etat;
-use App\Entity\Sortie;
-use App\Entity\Site;
 use App\Entity\Lieu;
+use App\Entity\Site;
+use App\Entity\Sortie;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class SortieType extends AbstractType
+final class SortieType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -28,21 +29,23 @@ class SortieType extends AbstractType
             ])
             ->add('nbInscriptionsMax')
             ->add('infoSortie')
-            ->add('etat', EntityType::class, [
-                'class' => Etat::class,
-                'choice_label' => 'libelle',
-            ])
+//            ->add('etat', HiddenType::class, [
+//            'mapped' => true,
+//         ])
             ->add('siteOrganisateur', EntityType::class, [
                 'class' => Site::class,
-                'choice_label' => 'nom',
-                'placeholder' => 'Choisissez un site',
-                'label' => 'Site Organisateur',
+                'choice_label' => 'nom', // ajusta al campo visible de tu entidad Site
+                'placeholder' => 'Sélectionnez un site',
+                'required' => true,
             ])
-            ->add('lieu', LieuType::class, [
-                'label' => 'Lieu',
-            ]);
+            ->add('lieu', EntityType::class, [
+                'class' => Lieu::class,
+                'choice_label' => 'nom', // ajusta si tu entidad Lieu usa otro campo
+                'placeholder' => 'Seleccione un lugar',
+                'required' => true,
+            ])
+        ;
     }
-
 
     public function configureOptions(OptionsResolver $resolver): void
     {
