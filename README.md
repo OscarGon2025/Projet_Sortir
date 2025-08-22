@@ -31,9 +31,9 @@ Les différents objectifs sont les suivants:
 
 - Symfony Messenger (Gestion de messages asynchrones via Doctrine)
 
-- Symfony UX / Leaflet (Cartographie)
+- Asset Mapper
 
-- Stimulus et Turbo (UX frontend)
+
 
 
 ---
@@ -63,9 +63,7 @@ Les principales dépendances installées :
 
 - symfony/ux-turbo
 
-- symfony/stimulus-bundle
 
-- symfony/ux-map (Leaflet)
 
 
 Drivers/Extensions nécessaires :
